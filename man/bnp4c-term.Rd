@@ -12,7 +12,7 @@
 # binary: b2np4c(alpha=0.5, fixed=TRUE)
 }
 \arguments{
-\item{alpha}{value of \eqn{\alpha}, the power to which the four-cycle count at each node is raised.}
+\item{alpha}{value of \eqn{\alpha}, the power to which the four-cycle count at each node is raised, where \eqn{0 < \alpha \leq 1}.}
 \item{fixed}{optional argument indicating whether the \eqn{\alpha} parameter is fixed at the given value, or is to be fit as a curved exponential-family model (see Hunter and Handcock, 2006). The default value is TRUE, which means that the \eqn{\alpha} parameter is fixed. Currently this parameter must be set to TRUE.}
 } 
 
