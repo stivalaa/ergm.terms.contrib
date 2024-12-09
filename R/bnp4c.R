@@ -116,7 +116,7 @@ InitErgmTerm.b1np4c <- function(nw, arglist, ...) {
   if(length(a$alpha) > 1)
     stop("The argument alpha to b1np4c expected a vector of length ",
          "1, but received a vector of length ",length(a$alpha))
-  alpha = alpha[1]
+  alpha = a$alpha[1]
   if (alpha <= 0.0 || alpha > 1)
     stop("The argument alpha to b1np4c must be 0 < alpha <= 1 ",
          "but received the value ", alpha)
@@ -138,7 +138,7 @@ InitErgmTerm.b2np4c <- function(nw, arglist, ...) {
   if(length(a$alpha) > 1)
     stop("The argument alpha to b2np4c expected a vector of length ",
          "1, but received a vector of length ",length(a$alpha))
-  alpha = alpha[1]
+  alpha = a$alpha[1]
   if (alpha <= 0.0 || alpha > 1)
     stop("The argument alpha to b1np4c must be 0 < alpha <= 1 ",
          "but received the value ", alpha)
