@@ -113,10 +113,14 @@
 
 InitErgmTerm.b1np4c <- function(nw, arglist, ...) {
   a <- check.ErgmTerm(nw, arglist, directed = FALSE, bipartite = TRUE, varnames = c("alpha", "fixed"), vartypes = c("numeric", "logical"), defaultvalues = list(0.5, TRUE), required = c(TRUE, TRUE))
-  alpha <- a$alpha
-  fixed <- a$fixed
+  if(length(a$alpha) > 1)
+    stop("The argument alpha to b1np4c expected a vector of length ",
+         "1, but received a vector of length ",length(a$alpha))
   alpha = alpha[1]
-  nb1 <- get.network.attribute(nw, "bipartite")
+  if (alpha <= 0.0 || alpha > 1)
+    stop("The argument alpha to b1np4c must be 0 < alpha <= 1 ",
+         "but received the value ", alpha)
+  fixed <- a$fixed
   if (!fixed) {
     stop("The b1np4c term is not yet able to handle a ", 
          "non-fixed decay term.", call. = FALSE)
@@ -131,10 +135,14 @@ InitErgmTerm.b1np4c <- function(nw, arglist, ...) {
 
 InitErgmTerm.b2np4c <- function(nw, arglist, ...) {
   a <- check.ErgmTerm(nw, arglist, directed = FALSE, bipartite = TRUE, varnames = c("alpha", "fixed"), vartypes = c("numeric", "logical"), defaultvalues = list(0.5, TRUE), required = c(TRUE, TRUE))
-  alpha <- a$alpha
-  fixed <- a$fixed
+  if(length(a$alpha) > 1)
+    stop("The argument alpha to b2np4c expected a vector of length ",
+         "1, but received a vector of length ",length(a$alpha))
   alpha = alpha[1]
-  nb1 <- get.network.attribute(nw, "bipartite")
+  if (alpha <= 0.0 || alpha > 1)
+    stop("The argument alpha to b1np4c must be 0 < alpha <= 1 ",
+         "but received the value ", alpha)
+  fixed <- a$fixed
   if (!fixed) {
     stop("The b2np4c term is not yet able to handle a ", 
          "non-fixed decay term.", call. = FALSE)
