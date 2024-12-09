@@ -24,7 +24,7 @@
 
 
 These statistics are described in Stivala et al. (2024).
-The \code{b1np4c} and \code{b2np4c} statistics were first implemented in EstimNetDirected \url{https://github.com/stivalaa/EstimNetDirected} as BipartiteFourCyclesNodePowerA and BipartiteFourCyclesNodePowerB.
+The \code{b1np4c} and \code{b2np4c} statistics were first implemented in EstimNetDirected (\url{https://github.com/stivalaa/EstimNetDirected}) as BipartiteFourCyclesNodePowerA and BipartiteFourCyclesNodePowerB.
 
 TODO: PUT SHORT DESCRIPTION HERE.
 
