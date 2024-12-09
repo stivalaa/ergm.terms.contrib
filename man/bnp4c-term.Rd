@@ -13,7 +13,7 @@
 }
 \arguments{
 \item{alpha}{value of \eqn{\alpha}, the power to which the four-cycle count at each node is raised.}
-\item{fixed}{optional argument indicating whether the \eqn{\alpha} parameter is fixed at the given value, or is to be fit as a curved epxonential-family model (see Hunter and Handcock, 2006). The default value is TRUE, which means that the \eqn{\alpha} parameter is fixed. Currently this parameter must be set to TRUE.}
+\item{fixed}{optional argument indicating whether the \eqn{\alpha} parameter is fixed at the given value, or is to be fit as a curved exponential-family model (see Hunter and Handcock, 2006). The default value is TRUE, which means that the \eqn{\alpha} parameter is fixed. Currently this parameter must be set to TRUE.}
 } 
 
 \details{
@@ -26,7 +26,7 @@ The argument fixed indicates whether the scale parameter lambda is to be fit as 
 
 TODO: PUT DESCRIPTION HERE.
 
-Note that allthough the default is \code{fixed=FALSE} the terms are not yet able to handle a non-fixed decay term so it must be set to TRUE.
+Note that allthough there is a \code{fixed} paramter, the terms are not yet able to handle a non-fixed \code{alpha} term so it must be set to the default value \code{fixed=TRUE}.
 }
 
 \seealso{
@@ -34,8 +34,6 @@ Note that allthough the default is \code{fixed=FALSE} the terms are not yet able
 }
 
 
-%\value{\code{\link{ergm}} returns an object of class 'ergm' that is a list.
-%}
 \references{
 Hunter, D. R. and M. S. Handcock (2006). Inference in curved exponential family models for networks. Journal of Computational and Graphical Statistics, 15: 565-583.
 
