@@ -5,7 +5,7 @@ require(ergm.terms.contrib)
 bel <- data.frame(actor = c("a","a","a","b","b","b","b","c","c","c","c"), 
                   event = c("e1","e2","e3","e3","e1","e4","e5","e3","e1","e4","e6"))
 
-bnet <- network(bel,bipartite=3,directed=FALSE)
+bnet <- network(bel,bipartite=TRUE,directed=FALSE)
 
 
 # plot for visualy checking the debugging
