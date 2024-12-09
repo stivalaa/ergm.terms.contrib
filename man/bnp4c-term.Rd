@@ -7,31 +7,30 @@
 \description{
   Nodewise four-cycle counts raised to a power (inside-\eqn{\alpha} weighting) for first and second modes of bipartite networks.
 }
-%\usage{
-%terms.ergm()
-
-%}
-%\arguments{
-%\item{\dots}{Specific to the model term.}
-%}
+\usage{
+# binary: b1np4c(alpha=0.5, fixed=TRUE)
+# binary: b2np4c(alpha=0.5, fixed=TRUE)
+}
+\arguments{
+\item{alpha}{value of \eqn{\alpha}, the power to which the four-cycle count at each node is raised.}
+\item{fixed}{optional argument indicating whether the \eqn{\alpha} parameter is fixed at the given value, or is to be fit as a curved epxonential-family model (see Hunter and Handcock, 2006). The default value is TRUE, which means that the \eqn{\alpha} parameter is fixed. Currently this parameter must be set to TRUE.}
+} 
 
 \details{
 
-\code{b1np4c(alpha=0.5, fixed=TRUE) (binary) (bipartite) (undirected)}
-
-TOD: PUT DESCRIPTION HERE.
+TODO: PUT DESCRIPTION HERE.
 The argument fixed indicates whether the scale parameter lambda is to be fit as a curved exponential-family model (see Hunter and Handcock, 2006). Currently, the fixed argument must be set to TRUE, which means the weight parameter alpha is not separately estimated and thus the model is not a CEF model. This term can only be used with undirected bipartite networks.
 
 \code{b2np4c(alpha=0.5 fixed=TRUE) (binary) (bipartite) (undirected)}
 
 
-TOD: PUT DESCRIPTION HERE.
+TODO: PUT DESCRIPTION HERE.
 
 Note that allthough the default is \code{fixed=FALSE} the terms are not yet able to handle a non-fixed decay term so it must be set to TRUE.
 }
 
 \seealso{
-  See also \code{\link[ergm]{gwb1dsp}} term. 
+  See also \code{\link[ergm]{'gwb1dsp-ergmTerm'}} term. 
 }
 
 
