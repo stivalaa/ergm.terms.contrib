@@ -1,8 +1,8 @@
 #ifndef CHANGESTATS_H
 #define CHANGESTATS_H
 
-#include "edgetree.h"
-#include "changestat.h"
+#include "ergm_edgetree.h"
+#include "ergm_changestat.h"
 
 
 
