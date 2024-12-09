@@ -112,7 +112,7 @@
 
 
 InitErgmTerm.b1np4c <- function(nw, arglist, ...) {
-  a <- check.ErgmTerm(nw, arglist, directed = FALSE, bipartite = TRUE, varnames = c("alpha", "fixed"), vartypes = c("numeric", "logical"), defaultvalues = list(0.5, TRUE), required = c(TRUE, TRUE))
+  a <- check.ErgmTerm(nw, arglist, directed = FALSE, bipartite = TRUE, varnames = c("alpha", "fixed"), vartypes = c("numeric", "logical"), defaultvalues = list(0.5, TRUE), required = c(FALSE, FALSE))
   if(length(a$alpha) > 1)
     stop("The argument alpha to b1np4c expected a vector of length ",
          "1, but received a vector of length ",length(a$alpha))
@@ -134,7 +134,7 @@ InitErgmTerm.b1np4c <- function(nw, arglist, ...) {
 
 
 InitErgmTerm.b2np4c <- function(nw, arglist, ...) {
-  a <- check.ErgmTerm(nw, arglist, directed = FALSE, bipartite = TRUE, varnames = c("alpha", "fixed"), vartypes = c("numeric", "logical"), defaultvalues = list(0.5, TRUE), required = c(TRUE, TRUE))
+  a <- check.ErgmTerm(nw, arglist, directed = FALSE, bipartite = TRUE, varnames = c("alpha", "fixed"), vartypes = c("numeric", "logical"), defaultvalues = list(0.5, TRUE), required = c(FALSE, FALSE))
   if(length(a$alpha) > 1)
     stop("The argument alpha to b2np4c expected a vector of length ",
          "1, but received a vector of length ",length(a$alpha))
