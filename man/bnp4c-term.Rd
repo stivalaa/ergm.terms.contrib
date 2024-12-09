@@ -5,7 +5,7 @@
 \docType{methods}
 \title{Bipartite nodepower four-cycles terms (b1np4c and b2np4c)}
 \description{
-  Nodewise four-cycle counts raised to a power (inside-\eqn{\alpha} weighting) for first and second modes of bipartite networks.
+  Nodewise four-cycle counts raised to a power (\eqn{\alpha}-inside weighting) for first and second modes of bipartite networks.
 }
 \usage{
 # binary: b1np4c(alpha=0.5, fixed=TRUE)
