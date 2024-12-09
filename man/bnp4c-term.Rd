@@ -18,13 +18,17 @@
 
 \details{
 
-TODO: PUT DESCRIPTION HERE.
-The argument fixed indicates whether the scale parameter lambda is to be fit as a curved exponential-family model (see Hunter and Handcock, 2006). Currently, the fixed argument must be set to TRUE, which means the weight parameter alpha is not separately estimated and thus the model is not a CEF model. This term can only be used with undirected bipartite networks.
+\code{b1np4c(alpha=0.5 fixed=TRUE) (binary) (bipartite) (undirected)}
 
 \code{b2np4c(alpha=0.5 fixed=TRUE) (binary) (bipartite) (undirected)}
 
 
-TODO: PUT DESCRIPTION HERE.
+These statistics are described in Stivala et al. (2024).
+The \code{b1np4c} and \code{b2np4c} statistics were first implemented in EstimNetDirected \url{https://github.com/stivalaa/EstimNetDirected} as BipartiteFourCyclesNodePowerA and BipartiteFourCyclesNodePowerB.
+
+TODO: PUT SHORT DESCRIPTION HERE.
+
+The argument fixed indicates whether the scale parameter lambda is to be fit as a curved exponential-family model (see Hunter and Handcock, 2006). Currently, the fixed argument must be set to TRUE, which means the weight parameter alpha is not separately estimated and thus the model is not a CEF model. This term can only be used with undirected bipartite networks.
 
 Note that allthough there is a \code{fixed} paramter, the terms are not yet able to handle a non-fixed \code{alpha} term so it must be set to the default value \code{fixed=TRUE}.
 }
