@@ -30,7 +30,7 @@ Note that allthough there is a \code{fixed} paramter, the terms are not yet able
 }
 
 \seealso{
-  See also \code{\link[ergm]{'gwb1dsp-ergmTerm'}} term. 
+  See also \code{\link[ergm]{gwb1dsp-ergmTerm}} term. 
 }
 
 
