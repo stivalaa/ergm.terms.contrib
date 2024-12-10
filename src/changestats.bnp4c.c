@@ -236,21 +236,34 @@ D_CHANGESTAT_FN(d_b1np4c) {
 D_CHANGESTAT_FN(d_b2np4c) {
   double change, alpha, delta;
   unsigned long count, vcount;
-  Vertex tail, head, vnode;
+  Vertex vnode, b1, b2;
   Edge edge;
   int i;
 
   alpha = INPUT_PARAM[0];
-  
+
   ZERO_ALL_CHANGESTATS(i);
   FOR_EACH_TOGGLE(i) {
-    tail = TAIL(i);
-    head = HEAD(i);
+    b1 = TAIL(i);
+    b2 = HEAD(i);
 
-    change = change_fourcycles(nwp, tail, head); /* TODO testing delta C4 for now */
-    CHANGE_STAT[0] += IS_UNDIRECTED_EDGE(tail, head) ? -change : change;
+    /* Number of four-cycles the node is already involved in */
+    count = num_fourcycles_node(nwp, b2);
 
+    /* change statistic for four-cycles */
+    delta = change_fourcycles(nwp, b1, b2);
+    change = pow(count + delta, alpha) - pow(count, alpha);
+
+    /* add contribution from sum over neighbours of b1 */
+    /* see comment above: the degree of a b1 is equivalent to its outdegree */
+    STEP_THROUGH_OUTEDGES(b1, edge, vnode) {
+      vcount = num_fourcycles_node(nwp, vnode);
+      delta = twopaths(nwp, vnode, b2);
+      change += pow(vcount + delta, alpha) - pow(vcount, alpha);
+    }
+    CHANGE_STAT[0] += IS_UNDIRECTED_EDGE(b1, b2) ? -change : change;
     TOGGLE_IF_MORE_TO_COME(i);
   }
   UNDO_PREVIOUS_TOGGLES(i);
+
 }
