@@ -221,7 +221,7 @@ D_CHANGESTAT_FN(d_b1np4c) {
       delta = twopaths(nwp, vnode, tail);
       change += pow(vcount + delta, alpha) - pow(vcount, alpha);
     }
-    CHANGE_STAT[0] += IS_OUTEDGE(tail, head) ? -change : change;
+    CHANGE_STAT[0] += IS_UNDIRECTED_EDGE(tail, head) ? -change : change;
     TOGGLE_IF_MORE_TO_COME(i);
   }
   UNDO_PREVIOUS_TOGGLES(i);
@@ -244,7 +244,7 @@ D_CHANGESTAT_FN(d_b2np4c) {
     head = HEAD(i);
 
     change = change_fourcycles(nwp, tail, head); /* TODO testing delta C4 for now */
-    CHANGE_STAT[0] += IS_OUTEDGE(tail, head) ? -change : change;
+    CHANGE_STAT[0] += IS_UNDIRECTED_EDGE(tail, head) ? -change : change;
 
     TOGGLE_IF_MORE_TO_COME(i);
   }
