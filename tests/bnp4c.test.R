@@ -95,6 +95,31 @@ fourcycles3.revmode.pajek.text <-
 5 3'
 fourcycles3.revmode.net <- read.paj(textConnection(fourcycles3.revmode.pajek.text))
 
+fourcycles6.pajek.text <-
+'*Vertices 8 2
+1 "1"
+2 "3"
+3 "2"
+4 "4"
+5 "5"
+6 "6"
+7 "7"
+8 "8"
+*Edges
+1 3
+3 2
+2 4
+1 4
+1 5
+2 5
+1 6
+2 6
+1 7
+2 7
+1 8
+2 8'
+fourcycles6.net <- read.paj(textConnection(fourcycles6.pajek.text))
+
 
 ##
 ## Tests
@@ -122,6 +147,8 @@ test_that('bnp4c terms', {
 
 
   ## Four-cycles-6
+  expect_equal(as.vector(summary(fourcycles6.net ~ b1np4c(0.5, TRUE))), 7.74597, tolerance=1e-05)
+  expect_equal(as.vector(summary(fourcycles6.net ~ b2np4c(0.5, TRUE))), 13.4164, tolerance=1e-04)
 
   ## Ten-cycle
 
