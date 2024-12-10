@@ -62,7 +62,7 @@ static unsigned long n_choose_2(int n)
  * number of undirected two-paths for (i, j): paths i -- v -- j for some v
  *
  */
-static unsigned long twopaths(Network *nwp, Vertex i, Vertex j)  {
+static unsigned int twopaths(Network *nwp, Vertex i, Vertex j)  {
   /* Note Network *nwp parameter has to be called nwp for use of macros */
 
   Vertex vnode, wnode;
@@ -153,6 +153,30 @@ static unsigned long num_fourcycles_node(Network *nwp, Vertex unode)  {
 }
 
 
+/*
+ * Change statistic for number of four-cycles in undirected network
+ * when edge i -- j is added
+ */
+static unsigned long change_fourcycles(Network *nwp, Vertex i, Vertex j) {
+  /* Note Network *nwp parameter has to be called nwp for use of macros */
+  Vertex vnode;
+  Edge edge;
+  unsigned long delta = 0;
+
+  /* In an undirected network, each edge is only stored as (tail, head) where
+     tail < head, so to step through all edges of a node it is necessary
+     to step through all outedges and also through all inedges */
+  STEP_THROUGH_OUTEDGES(i, edge, vnode) {
+    delta += twopaths(nwp, vnode, j);
+  }
+  STEP_THROUGH_INEDGES(i, edge, vnode) {
+    delta += twopaths(nwp, vnode, j);
+  }
+  return (double)delta;
+}
+
+
+
 
 /*****************************************************************************
  *
@@ -162,21 +186,18 @@ static unsigned long num_fourcycles_node(Network *nwp, Vertex unode)  {
 
 
 D_CHANGESTAT_FN(d_b1np4c) {
-  double change, alpha;
+  double change, alpha, delta;
+  unsigned long count, vcount;
   Vertex tail, head, unode, vnode, wnode;
   Edge edge1, edge2;
   int i;
-  unsigned long fourcycle_count;
-  
+
+  alpha = INPUT_PARAM[0];
 
   ZERO_ALL_CHANGESTATS(i);
   FOR_EACH_TOGGLE(i) {
     tail = TAIL(i);
     head = HEAD(i);
-    alpha = INPUT_PARAM[0];
-
-    fourcycle_count = num_fourcycles_node(nwp, tail);
-    change = fourcycle_count;
 
     CHANGE_STAT[0] += IS_OUTEDGE(tail, head) ? -change : change;
     TOGGLE_IF_MORE_TO_COME(i);
@@ -186,11 +207,22 @@ D_CHANGESTAT_FN(d_b1np4c) {
 
 
 
-D_CHANGESTAT_FN(d_b2np4c) { 
+D_CHANGESTAT_FN(d_b2np4c) {
+  double change, alpha, delta;
+  Vertex tail, head, unode, vnode, wnode;
+  Edge edge1, edge2;
   int i;
+
+  alpha = INPUT_PARAM[0];
   
   ZERO_ALL_CHANGESTATS(i);
   FOR_EACH_TOGGLE(i) {
+    tail = TAIL(i);
+    head = HEAD(i);
+
+    change = change_fourcycles(nwp, tail, head); /* TODO testing delta C4 for now */
+    CHANGE_STAT[0] += IS_OUTEDGE(tail, head) ? -change : change;
+
     TOGGLE_IF_MORE_TO_COME(i);
   }
   UNDO_PREVIOUS_TOGGLES(i);
