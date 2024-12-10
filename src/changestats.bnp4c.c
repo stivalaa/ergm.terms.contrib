@@ -12,15 +12,15 @@
  *
  * Change statistics for number of 4-cycles at each node raised to a
  * power alpha (0 < alpha <= 1) before summing (i.e. the "alpha-inside"
- * weighting according to the description of Wilson et al. (2017).
+ * weighting according to the description of Wilson et al. (2017)).
  *
  * b1np4c is for nodes in the first bipartition, and b2np4c is for nodes
  * in the second bipartition.
  *
- * These statistics are described in Stivala et al. (2024).  The
- * b1np4c and b2np4c statistics were first implemented in
- * EstimNetDirected (https://github.com/stivalaa/EstimNetDirected}
- * as BipartiteFourCyclesNodePowerA and BipartiteFourCyclesNodePowerB.
+ * These statistics are described in Stivala et al. (2024). The b1np4c
+ * and b2np4c statistics were first implemented in EstimNetDirected
+ * (https://github.com/stivalaa/EstimNetDirected} as
+ * BipartiteFourCyclesNodePowerA and BipartiteFourCyclesNodePowerB.
  *
  * These statistics are only for undirected bipartite networks.
  *
@@ -69,7 +69,7 @@ static unsigned int twopaths(Network *nwp, Vertex i, Vertex j)  {
   Edge edge1, edge2;
   unsigned int count = 0;
 
-  /* It would be better if we could cache two-path counts like
+  /* It would be better if we could precompute or cache two-path counts like
      EstimNetDirected or statnet gwesp etc. cache */
 
   /* In an undirected network, each edge is only stored as (tail, head) where
