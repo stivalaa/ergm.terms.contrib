@@ -49,6 +49,7 @@ library(ergm.terms.contrib)
 ## (and unsure if I should add data files to the tests directory, easier
 ## to embed them as here documents in this script).
 ##
+
 fourcycle.pajek.text <- 
 '*Vertices 4 2
 1 "1"
@@ -62,16 +63,56 @@ fourcycle.pajek.text <-
 1 4'
 fourcycle.net <- read.paj(textConnection(fourcycle.pajek.text))
 
+fourcycles3.pajek.text <-
+'*Vertices 5 2
+1 "1"
+2 "3"
+3 "2"
+4 "4"
+5 "5"
+*Edges
+1 3
+3 2
+2 4
+1 4
+1 5
+2 5'
+fourcycles3.net <- read.paj(textConnection(fourcycles3.pajek.text))
 
 
 ##
-## Tests on the example/test networks
+## Tests
 ##
+
 
 test_that('bnp4c terms', {
+  ##
+  ## Tests on the example/test networks.
+  ## See Table 4 of Stivala et al. (2024) and Tests/TestChangeStatsBipartite/
+  ## in EstimNetDirected GitHub repository.
+  ##
 
+  ## Four-cycle
   expect_equal(as.vector(summary(fourcycle.net ~  b1np4c(0.5, TRUE))), 2)
   expect_equal(as.vector(summary(fourcycle.net ~  b2np4c(0.5, TRUE))), 2)
+
+  ## Four-cycles-3
+  expect_equal(as.vector(summary(fourcycles3.net ~ b1np4c(0.5, TRUE))), 3.4641, tolerance=1e-04)
+  expect_equal(as.vector(summary(fourcycles3.net ~ b2np4c(0.5, TRUE))), 4.24264, tolerance=1e-05)
+
+  ## Four-cycles-3-B
+
+  ## Four-cycles-6
+
+  ## Ten-cycle
+
+  ## Eight-path
+
+  ## Nine-star
+
+  ## Nine-star-B
+
+  ## Four-fan-3
   
 })
 
