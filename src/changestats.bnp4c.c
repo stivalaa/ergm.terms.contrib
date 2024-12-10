@@ -216,6 +216,11 @@ D_CHANGESTAT_FN(d_b1np4c) {
       delta = twopaths(nwp, vnode, tail);
       change += pow(vcount + delta, alpha) - pow(vcount, alpha);
     }
+    STEP_THROUGH_INEDGES(head, edge, vnode) {
+      vcount = num_fourcycles_node(nwp, vnode);
+      delta = twopaths(nwp, vnode, tail);
+      change += pow(vcount + delta, alpha) - pow(vcount, alpha);
+    }
     CHANGE_STAT[0] += IS_OUTEDGE(tail, head) ? -change : change;
     TOGGLE_IF_MORE_TO_COME(i);
   }
