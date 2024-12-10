@@ -58,6 +58,51 @@ static unsigned long n_choose_2(int n)
   return (unsigned long)n * (n - 1) / 2;
 }
 
+/*
+ * number of undirected two-paths for (i, j): paths i -- v -- j for some v
+ *
+ */
+static unsigned long twopaths(Network *nwp, Vertex i, Vertex j)  {
+  /* Note Network *nwp parameter has to be called nwp for use of macros */
+
+  Vertex vnode, wnode;
+  Edge edge1, edge2;
+  unsigned int count = 0;
+
+  /* It would be better if we could cache two-path counts like
+     EstimNetDirected or statnet gwesp etc. cache */
+
+  /* In an undirected network, each edge is only stored as (tail, head) where
+     tail < head, so to step through all edges of a node it is necessary
+     to step through all outedges and also through all inedges */
+  STEP_THROUGH_OUTEDGES(i, edge1, vnode) {     /* i -- v */
+    if (vnode == i || vnode == j)
+      continue;
+    STEP_THROUGH_OUTEDGES(j, edge2, wnode) {
+      if (wnode == vnode)     /* v -- j */
+        count++;
+    }
+    STEP_THROUGH_INEDGES(j, edge2, wnode) {
+      if (wnode == vnode)      /* v -- j */
+        count++;
+    }
+  }
+  STEP_THROUGH_INEDGES(i, edge1, vnode) {     /* i -- v */
+    if (vnode == i || vnode == j)
+      continue;
+    STEP_THROUGH_OUTEDGES(j, edge2, wnode) {
+      if (wnode == vnode)     /* v -- j */
+        count++;
+    }
+    STEP_THROUGH_INEDGES(j, edge2, wnode) {
+      if (wnode == vnode)      /* v -- j */
+        count++;
+    }
+  }
+  return count;
+}
+
+
 
 /*
  * number of four-cycles that node unode is involved in
@@ -79,13 +124,13 @@ static unsigned long num_fourcycles_node(Network *nwp, Vertex unode)  {
     STEP_THROUGH_OUTEDGES(vnode, edge2, wnode) {
       if (wnode != unode && !visited[wnode]) {
         visited[wnode] = 1;
-        fourcycle_count += 1; /*FIXME: CHOOSE(L2(unode,wnode), 2) */
+        fourcycle_count += n_choose_2(twopaths(nwp, unode, wnode));
       }
     }
     STEP_THROUGH_INEDGES(vnode, edge2, wnode) {
       if (wnode != unode && !visited[wnode]) {
         visited[wnode] = 1;
-        fourcycle_count += 1; /*FIXME: CHOOSE(L2(unode,wnode), 2) */
+        fourcycle_count += n_choose_2(twopaths(nwp, unode, wnode));
       }
     }
   }
@@ -93,13 +138,13 @@ static unsigned long num_fourcycles_node(Network *nwp, Vertex unode)  {
     STEP_THROUGH_OUTEDGES(vnode, edge2, wnode) {
       if (wnode != unode && !visited[wnode]) {
         visited[wnode] = 1;
-        fourcycle_count += 1; /*FIXME: CHOOSE(L2(unode,wnode), 2) */
+        fourcycle_count += n_choose_2(twopaths(nwp, unode, wnode));
       }
     }
     STEP_THROUGH_INEDGES(vnode, edge2, wnode) {
       if (wnode != unode && !visited[wnode]) {
         visited[wnode] = 1;
-        fourcycle_count += 1; /*FIXME: CHOOSE(L2(unode,wnode), 2) */
+        fourcycle_count += n_choose_2(twopaths(nwp, unode, wnode));
       }
     }
   }
