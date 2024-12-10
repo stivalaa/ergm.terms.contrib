@@ -36,7 +36,7 @@ Wilson et al. (2017), this is an "\eqn{\alpha}-inside" weighting.
 The argument \code{fixed} indicates whether the parameter \code{alpha}
 is to be fit as a curved exponential-family model (see Hunter and
 Handcock, 2006). Currently, the fixed argument must be set to TRUE,
-which means the weight parameter alpha is not separately estimated and
+which means the weight parameter\code{alpha} is not separately estimated and
 thus the model is not a CEF model.
 
 This term can only be used with undirected bipartite networks.
