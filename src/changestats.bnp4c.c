@@ -219,7 +219,7 @@ D_CHANGESTAT_FN(d_b1np4c) {
     change = pow(count + delta, alpha) - pow(count, alpha);
 
     /* add contribution from sum over neighbours of b2 */
-    /* see comment above: the degree of a b2 is eqwuivalent to its indegree */
+    /* see comment above: the degree of a b2 is equivalent to its indegree */
     STEP_THROUGH_INEDGES(b2, edge, vnode) {
       vcount = num_fourcycles_node(nwp, vnode);
       delta = twopaths(nwp, vnode, b1);
