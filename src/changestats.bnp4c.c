@@ -46,6 +46,18 @@
  *
  *****************************************************************************/
 
+/*
+ * Binomial coefficient n choose 2
+ * simple and efficient special case instead of using CHOOSE(n, 2)
+ */
+static unsigned long n_choose_2(int n)
+{
+  if (n < 2) {
+    return 0;
+  }
+  return (unsigned long)n * (n - 1) / 2;
+}
+
 
 /*
  * number of four-cycles that node unode is involved in
