@@ -188,8 +188,8 @@ static unsigned long change_fourcycles(Network *nwp, Vertex i, Vertex j) {
 D_CHANGESTAT_FN(d_b1np4c) {
   double change, alpha, delta;
   unsigned long count, vcount;
-  Vertex tail, head, unode, vnode, wnode;
-  Edge edge1, edge2;
+  Vertex tail, head, vnode;
+  Edge edge;
   int i;
 
   alpha = INPUT_PARAM[0];
@@ -199,6 +199,23 @@ D_CHANGESTAT_FN(d_b1np4c) {
     tail = TAIL(i);
     head = HEAD(i);
 
+    /* Number of four-cycles the node is already involved in */
+    count = num_fourcycles_node(nwp, i);
+
+    /* change statistic for four-cycles */
+    delta = change_fourcycles(nwp, tail, head);
+    change = pow(count + delta, alpha) - pow(count, alpha);
+
+    /* add contribution from sum over neighbours of head */
+    /* In an undirected network, each edge is only stored as (tail,
+     head) where tail < head, so to step through all edges of a node
+     it is necessary to step through all outedges and also through all
+     inedges */
+    STEP_THROUGH_OUTEDGES(head, edge, vnode) {
+      vcount = num_fourcycles_node(nwp, vnode);
+      delta = twopaths(nwp, vnode, tail);
+      change += pow(vcount + delta, alpha) - pow(vcount, alpha);
+    }
     CHANGE_STAT[0] += IS_OUTEDGE(tail, head) ? -change : change;
     TOGGLE_IF_MORE_TO_COME(i);
   }
@@ -209,8 +226,9 @@ D_CHANGESTAT_FN(d_b1np4c) {
 
 D_CHANGESTAT_FN(d_b2np4c) {
   double change, alpha, delta;
-  Vertex tail, head, unode, vnode, wnode;
-  Edge edge1, edge2;
+  unsigned long count, vcount;
+  Vertex tail, head, vnode;
+  Edge edge;
   int i;
 
   alpha = INPUT_PARAM[0];
