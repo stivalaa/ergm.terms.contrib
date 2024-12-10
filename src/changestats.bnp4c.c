@@ -212,7 +212,7 @@ D_CHANGESTAT_FN(d_b1np4c) {
     b2 = HEAD(i);
 
     /* Number of four-cycles the node is already involved in */
-    count = num_fourcycles_node(nwp, i);
+    count = num_fourcycles_node(nwp, b1);
 
     /* change statistic for four-cycles */
     delta = change_fourcycles(nwp, b1, b2);
