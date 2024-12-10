@@ -125,6 +125,22 @@ fourcycles6.net <- read.paj(textConnection(fourcycles6.pajek.text))
 ## Tests
 ##
 
+test_that('bnp4c terms invalid inputs', {
+  ## alpha must be in (0, 1]
+  expect_error(summary(fourcycle.net ~ b1np4c(0.0)))
+  expect_error(summary(fourcycle.net ~ b2np4c(0.0)))
+  expect_error(summary(fourcycle.net ~ b1np4c(1.01)))
+  expect_error(summary(fourcycle.net ~ b2np4c(1.01)))
+  expect_no_error(summary(fourcycle.net ~ b1np4c(1.0)))
+  expect_no_error(summary(fourcycle.net ~ b2np4c(1.0)))
+
+  ## fixed=FALSE is not (yet) supported
+  expect_error(summary(fourcycle.net ~ b1np4c(0.4, FALSE)))
+  expect_error(summary(fourcycle.net ~ b1np4c(fixed=FALSE)))
+  expect_error(summary(fourcycle.net ~ b1np4c(alpha = 0.1,fixed=FALSE)))
+  expect_no_error(summary(fourcycle.net ~ b1np4c(0.4, TRUE)))
+  
+})
 
 test_that('bnp4c terms', {
   ##
