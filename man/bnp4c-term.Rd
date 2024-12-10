@@ -28,12 +28,18 @@ The \code{b1np4c} and \code{b2np4c} statistics were first implemented in EstimNe
 
 These statistics sum the number of four-cycles at each node in one
 bipartition (the first bipartition for \code{b1np4c} and the second
-bipartition for \code{b2np4c}) raised to the poewr \eqn{\alpha} \eqn{0 <
-  \alpha \leq 1}. That is, the count at each node is raised to the power
+bipartition for \code{b2np4c}) raised to the power \eqn{\alpha} (\eqn{0 <
+  \alpha \leq 1}). That is, the count at each node is raised to the power
 \eqn{\alpha}, and then they are summed. In the terminology of
-Wilson et al. 2017, this is an "\eqn{\alpha}-inside" weighting.
+Wilson et al. (2017), this is an "\eqn{\alpha}-inside" weighting.
 
-The argument fixed indicates whether the scale parameter lambda is to be fit as a curved exponential-family model (see Hunter and Handcock, 2006). Currently, the fixed argument must be set to TRUE, which means the weight parameter alpha is not separately estimated and thus the model is not a CEF model. This term can only be used with undirected bipartite networks.
+The argument \code{fixed} indicates whether the parameter \code{alpha}
+is to be fit as a curved exponential-family model (see Hunter and
+Handcock, 2006). Currently, the fixed argument must be set to TRUE,
+which means the weight parameter alpha is not separately estimated and
+thus the model is not a CEF model.
+
+This term can only be used with undirected bipartite networks.
 
 Note that allthough there is a \code{fixed} paramter, the terms are not yet able to handle a non-fixed \code{alpha} term so it must be set to the default value \code{fixed=TRUE}.
 }
