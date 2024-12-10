@@ -172,7 +172,7 @@ static unsigned long change_fourcycles(Network *nwp, Vertex i, Vertex j) {
   STEP_THROUGH_INEDGES(i, edge, vnode) {
     delta += twopaths(nwp, vnode, j);
   }
-  return (double)delta;
+  return delta;
 }
 
 
