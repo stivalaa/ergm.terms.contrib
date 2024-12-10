@@ -185,10 +185,22 @@ static unsigned long change_fourcycles(Network *nwp, Vertex i, Vertex j) {
  *****************************************************************************/
 
 
+/*
+ * From changestats.c:
+ *
+ *   For all bipartite networks:
+ * It is assumed that in this bipartite network, the only edges are
+ * of the form (b1, b2), where b1 is always strictly less
+ * than b2.  In other words, the degree of a b1 is equivalent
+ *  to its outdegree and the degree of a b2 is equivalent to its
+ * indegree.
+ */
+
+
 D_CHANGESTAT_FN(d_b1np4c) {
   double change, alpha, delta;
   unsigned long count, vcount;
-  Vertex tail, head, vnode;
+  Vertex vnode, b1, b2;
   Edge edge;
   int i;
 
@@ -196,32 +208,24 @@ D_CHANGESTAT_FN(d_b1np4c) {
 
   ZERO_ALL_CHANGESTATS(i);
   FOR_EACH_TOGGLE(i) {
-    tail = TAIL(i);
-    head = HEAD(i);
+    b1 = TAIL(i);
+    b2 = HEAD(i);
 
     /* Number of four-cycles the node is already involved in */
     count = num_fourcycles_node(nwp, i);
 
     /* change statistic for four-cycles */
-    delta = change_fourcycles(nwp, tail, head);
+    delta = change_fourcycles(nwp, b1, b2);
     change = pow(count + delta, alpha) - pow(count, alpha);
 
-    /* add contribution from sum over neighbours of head */
-    /* In an undirected network, each edge is only stored as (tail,
-     head) where tail < head, so to step through all edges of a node
-     it is necessary to step through all outedges and also through all
-     inedges */
-    STEP_THROUGH_OUTEDGES(head, edge, vnode) {
+    /* add contribution from sum over neighbours of b2 */
+    /* see comment above: the degree of a b2 is eqwuivalent to its indegree */
+    STEP_THROUGH_INEDGES(b2, edge, vnode) {
       vcount = num_fourcycles_node(nwp, vnode);
-      delta = twopaths(nwp, vnode, tail);
+      delta = twopaths(nwp, vnode, b1);
       change += pow(vcount + delta, alpha) - pow(vcount, alpha);
     }
-    STEP_THROUGH_INEDGES(head, edge, vnode) {
-      vcount = num_fourcycles_node(nwp, vnode);
-      delta = twopaths(nwp, vnode, tail);
-      change += pow(vcount + delta, alpha) - pow(vcount, alpha);
-    }
-    CHANGE_STAT[0] += IS_UNDIRECTED_EDGE(tail, head) ? -change : change;
+    CHANGE_STAT[0] += IS_UNDIRECTED_EDGE(b1, b2) ? -change : change;
     TOGGLE_IF_MORE_TO_COME(i);
   }
   UNDO_PREVIOUS_TOGGLES(i);
