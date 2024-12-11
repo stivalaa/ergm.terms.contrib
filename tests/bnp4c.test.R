@@ -120,6 +120,55 @@ fourcycles6.pajek.text <-
 2 8'
 fourcycles6.net <- read.paj(textConnection(fourcycles6.pajek.text))
 
+tencycle.pajek.text <-
+'*Vertices 10 5
+1 "1"
+2 "3"
+3 "5"
+4 "7"
+5 "9"
+6 "2"
+7 "4"
+8 "6"
+9 "8"
+10 "10"
+*Edges
+1 6
+6 2
+2 7
+7 3
+3 8
+8 4
+4 9
+9 5
+5 10
+1 10'
+tencycle.net <- read.paj(textConnection(tencycle.pajek.text))
+
+
+chain.pajek.text <-
+'*Vertices 9 5
+1 "1"
+2 "3"
+3 "5"
+4 "7"
+5 "9"
+6 "2"
+7 "4"
+8 "6"
+9 "8"
+*Edges
+1 6
+6 2
+2 7
+7 3
+3 8
+8 4
+4 9
+9 5'
+chain.net <- read.paj(textConnection(chain.pajek.text))
+
+
 
 ##
 ## Tests
@@ -176,8 +225,12 @@ test_that('bnp4c terms', {
   expect_equal(as.vector(summary(fourcycles6.net ~ b2np4c(0.5, TRUE))), 13.4164, tolerance=1e-04)
 
   ## Ten-cycle
+  expect_equal(as.vector(summary(tencycle.net ~ b1np4c(0.5, TRUE))), 0)
+  expect_equal(as.vector(summary(tencycle.net ~ b2np4c(0.5, TRUE))), 0)
 
   ## Eight-path
+  expect_equal(as.vector(summary(chain.net ~ b1np4c(0.5, TRUE))), 0)
+  expect_equal(as.vector(summary(chain.net ~ b2np4c(0.5, TRUE))), 0)
 
   ## Nine-star
 
