@@ -108,8 +108,9 @@ plot(summary(g.zero.pos ~ cycle(4)))
 
 ## plot visualization of one graph similar to
 ## Fig. 6 of Stivala et al. (2024)
+par(mfrow=c(1,1))
 plot(g.zero.pos[[88]],
      vertex.col= c(rep('red',100), rep('blue',50)),
-     vertex.shape = c(rep(50, 100), rep(4,50)))
+     vertex.sides = c(rep(50, 100), rep(4,50)))
 } }
 \keyword{models}
