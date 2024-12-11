@@ -168,6 +168,80 @@ chain.pajek.text <-
 9 5'
 chain.net <- read.paj(textConnection(chain.pajek.text))
 
+star.pajek.text <-
+'*Vertices 10 1
+1 "1"
+2 "2"
+3 "3"
+4 "4"
+5 "5"
+6 "6"
+7 "7"
+8 "8"
+9 "9"
+10 "10"
+*Edges
+1 2
+1 3
+1 4
+1 5
+1 6
+1 7
+1 8
+1 9
+1 10'
+star.net <- read.paj(textConnection(star.pajek.text))
+
+starB.pajek.text <-
+'*Vertices 10 9
+1 "2"
+2 "3"
+3 "4"
+4 "5"
+5 "6"
+6 "7"
+7 "8"
+8 "9"
+9 "10"
+10 "1"
+*Edges
+10 1
+10 2
+10 3
+10 4
+10 5
+10 6
+10 7
+10 8
+10 9'
+starB.net <- read.paj(textConnection(starB.pajek.text))
+
+fourfan3.pajek.text <-
+'*Vertices 10 4
+1 "1"
+2 "3"
+3 "6"
+4 "9"
+5 "2"
+6 "4"
+7 "5"
+8 "7"
+9 "8"
+10 "10"
+*Edges
+1 5
+5 2
+2 6
+1 6
+1 7
+7 3
+3 8
+1 8
+1 9
+9 4
+4 10
+1 10'
+fourfan3.net <- read.paj(textConnection(fourfan3.pajek.text))
 
 
 ##
@@ -219,7 +293,6 @@ test_that('bnp4c terms', {
   expect_equal(as.vector(summary(fourcycles3.revmode.net ~ b1np4c(0.5, TRUE))), 4.24264, tolerance=1e-05)
   expect_equal(as.vector(summary(fourcycles3.revmode.net ~ b2np4c(0.5, TRUE))), 3.4641, tolerance=1e-04)
 
-
   ## Four-cycles-6
   expect_equal(as.vector(summary(fourcycles6.net ~ b1np4c(0.5, TRUE))), 7.74597, tolerance=1e-05)
   expect_equal(as.vector(summary(fourcycles6.net ~ b2np4c(0.5, TRUE))), 13.4164, tolerance=1e-04)
@@ -233,11 +306,29 @@ test_that('bnp4c terms', {
   expect_equal(as.vector(summary(chain.net ~ b2np4c(0.5, TRUE))), 0)
 
   ## Nine-star
+  expect_equal(as.vector(summary(star.net ~ b1np4c(0.5, TRUE))), 0)
+  expect_equal(as.vector(summary(star.net ~ b2np4c(0.5, TRUE))), 0)
 
   ## Nine-star-B
+  expect_equal(as.vector(summary(starB.net ~ b1np4c(0.5, TRUE))), 0)
+  expect_equal(as.vector(summary(starB.net ~ b2np4c(0.5, TRUE))), 0)
 
   ## Four-fan-3
+  ##
+  ## From Stivala et al. (2024):
+  ##
+  ##   ... in this graph, the nodes in mode B contribute more to the
+  ##   total as each one (of the six) is involved in exactly one
+  ##   four-cycle (and hence raising to the power of α still
+  ##   contributes one to the sum), while of the four nodes in mode A,
+  ##   three are involved in only one four-cycle, while the fourth is
+  ##   involved in three four-cycles and hence contributes only 3^α ≈
+  ##   1.73205 (when α = 0.5).
+  ##
+  expect_equal(as.vector(summary(fourfan3.net ~ b1np4c(0.5, TRUE))), 4.73205, tolerance=1e-05)
+  expect_equal(as.vector(summary(fourfan3.net ~ b2np4c(0.5, TRUE))), 6)
   
 })
+
 
 
