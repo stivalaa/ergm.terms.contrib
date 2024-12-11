@@ -41,7 +41,7 @@ thus the model is not a CEF model.
 
 This term can only be used with undirected bipartite networks.
 
-Note that allthough there is a \code{fixed} paramter, the terms are not yet able to handle a non-fixed \code{alpha} term so it must be set to the default value \code{fixed=TRUE}.
+Note that allthough there is a \code{fixed} parameter, the terms are not yet able to handle a non-fixed \code{alpha} term so it must be set to the default value \code{fixed=TRUE}.
 }
 
 \seealso{
