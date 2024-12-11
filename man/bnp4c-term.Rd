@@ -36,7 +36,7 @@ Wilson et al. (2017), this is an "\eqn{\alpha}-inside" weighting.
 The argument \code{fixed} indicates whether the parameter \code{alpha}
 is to be fit as a curved exponential-family model (see Hunter and
 Handcock, 2006). Currently, the fixed argument must be set to TRUE,
-which means the weight parameter\code{alpha} is not separately estimated and
+which means the weight parameter \code{alpha} is not separately estimated and
 thus the model is not a CEF model.
 
 This term can only be used with undirected bipartite networks.
@@ -83,5 +83,32 @@ fourfan.3.net <- network(fourfan.3.df, bipartite=TRUE, directed=FALSE)
 ##   1.73205 (when α = 0.5).
 ##
 summary(fourfan.3.net ~ b1np4c(0.5, TRUE) + b2np4c(0.5, TRUE))
+
+## generate some graphs similar to 'zero.pos' in Fig. 5 and Fig. 6
+## of Stivala et al. (2024), with the parameter for b1np4c zero
+## and the parameter for b2np4c positive
+## (warning: takes about 30 seconds to run)
+system.time( g.zero.pos <- simulate(network(150, bipartite=100,
+                                           directed=FALSE) ~
+  edges + gwb1degree(.5,TRUE) + gwb2degree(.5, TRUE) + b2np4c(1/5),
+  coef=c(-6.0, 0.6, -0.5, 3.0),
+  nsim=100,
+  control = control.simulate(MCMC.burnin = 100000,
+                             MCMC.interval=10000)) )
+
+## plot graph statistics to check sufficient burnin and interval
+par(mfrow=c(2,3))
+plot(summary(g.zero.pos ~ edges))
+plot(summary(g.zero.pos ~ gwb1degree(.5,TRUE)))
+plot(summary(g.zero.pos ~ gwb2degree(.5,TRUE)))
+plot(summary(g.zero.pos ~ b2np4c(1/5)))
+plot(summary(g.zero.pos ~ b1np4c(1/5)))
+plot(summary(g.zero.pos ~ cycle(4)))
+
+## plot visualization of one graph similar to
+## Fig. 6 of Stivala et al. (2024)
+plot(g.zero.pos[[88]],
+     vertex.col= c(rep('red',100), rep('blue',50)),
+     vertex.shape = c(rep(50, 100), rep(4,50)))
 }
 \keyword{models}
