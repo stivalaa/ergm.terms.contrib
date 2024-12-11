@@ -296,6 +296,11 @@ test_that('bnp4c terms', {
   ## Four-cycles-6
   expect_equal(as.vector(summary(fourcycles6.net ~ b1np4c(0.5, TRUE))), 7.74597, tolerance=1e-05)
   expect_equal(as.vector(summary(fourcycles6.net ~ b2np4c(0.5, TRUE))), 13.4164, tolerance=1e-04)
+  ## and reverse the bipartite modes:
+  fourcycles6.revmode.net <- network(t(as.matrix(fourcycles6.net)))
+  expect_equal(as.vector(summary(fourcycles6.revmode.net ~ b1np4c(0.5, TRUE))), 13.4164, tolerance=1e-04)
+  expect_equal(as.vector(summary(fourcycles6.revmode.net ~ b2np4c(0.5, TRUE))), 7.74597, tolerance=1e-05)
+
 
   ## Ten-cycle
   expect_equal(as.vector(summary(tencycle.net ~ b1np4c(0.5, TRUE))), 0)
