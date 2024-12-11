@@ -116,6 +116,9 @@ static unsigned long num_fourcycles_node(Network *nwp, Vertex unode)  {
   int *visited = R_Calloc(N_NODES, int); /* list of visited nodes */
   unsigned long fourcycle_count = 0;
 
+  fprintf(stderr, "N_NODES = %d\n", N_NODES);
+  for (int x = 0; x < N_NODES; x++) fprintf(stderr, "%d\n",visited[x]);
+  
   /* this involves iterating over all nodes that are distance 2 from unode */
   /* In an undirected network, each edge is only stored as (tail, head) where
      tail < head, so to step through all edges of a node it is necessary
