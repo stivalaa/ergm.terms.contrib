@@ -19,7 +19,7 @@
 ## These statistics are only for undirected bipartite networks.
 ##
 ## For more details on the statistics and test data see
-## Stivla et al. (2024) and
+## Stivala et al. (2024) and
 ## https://github.com/stivalaa/EstimNetDirected/tree/master/Test/TestChangeStatsBipartite/
 ##
 ##
