@@ -244,6 +244,12 @@ fourfan3.pajek.text <-
 1 10'
 fourfan3.net <- read.paj(textConnection(fourfan3.pajek.text))
 
+## The same network, constructed with network() rather than read.paj()
+fourfan.3.df <- data.frame(A = c(1, 1, 1, 1, 1, 1, 3, 3, 6, 6, 9, 9),
+                           B = c(2, 4, 5, 7, 8, 10,2, 4, 5, 7, 8, 10))
+fourfan.3.net <- network(fourfan.3.df, bipartite=TRUE, directed=FALSE)
+
+
 
 ##
 ## Tests
@@ -333,7 +339,10 @@ test_that('bnp4c terms', {
   ##
   expect_equal(as.vector(summary(fourfan3.net ~ b1np4c(0.5, TRUE))), 4.73205, tolerance=1e-05)
   expect_equal(as.vector(summary(fourfan3.net ~ b2np4c(0.5, TRUE))), 6)
-  
+
+  expect_equal(as.vector(summary(fourfan.3.net ~ b1np4c(0.5, TRUE))), 4.73205, tolerance=1e-05)
+  expect_equal(as.vector(summary(fourfan.3.net ~ b2np4c(0.5, TRUE))), 6)
+
 })
 
 
