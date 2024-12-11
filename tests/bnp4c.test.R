@@ -20,7 +20,7 @@
 ##
 ## For more details on the statistics and test data see
 ## Stivla et al. (2024) and
-## https://github.com/stivalaa/EstimNetDirected/tree/master/Test/TestChangeStatsBipartite
+## https://github.com/stivalaa/EstimNetDirected/tree/master/Test/TestChangeStatsBipartite/
 ##
 ##
 ## References:
@@ -40,14 +40,15 @@ library(ergm)
 library(ergm.terms.contrib)
 
 ##
-## Read example networks. Note use of multiline strings as here document.
-## These networks were originally constructed using igraph in
-## by makeExampleNetworks.R in the Tests/TestChangeStatsBipartite directory
-## of EstimNetDirected (see GitHub location in file header comment),
-## so rather than adding a dependency on igraph here, easier to just
-## read them in from the Pajek .net files created by makeExamplesNetworks.R
-## (and unsure if I should add data files to the tests directory, easier
-## to embed them as here documents in this script).
+## Read example networks. Note use of multiline strings as here
+## document. These networks were originally constructed using igraph
+## in makeExampleNetworks.R in the Tests/TestChangeStatsBipartite
+## directory of EstimNetDirected (see GitHub location in file header
+## comment), so rather than adding a dependency on igraph here, easier
+## to just read them in from the Pajek .net files created by
+## makeExamplesNetworks.R (and unsure if I should add data files to
+## the tests directory, easier to embed them as here documents in this
+## script).
 ##
 
 fourcycle.pajek.text <- 
