@@ -65,8 +65,23 @@ Alex Stivala \email{alex.d.stivala@gmail.com}
 }
 
 \examples{
-require(ergm.terms.contrib)
-# TODO: PUT EXAMPLE HERE
+library(ergm.terms.contrib)
 
+## Construct the Four-fan-3 graph
+fourfan.3.df <- data.frame(A = c(1, 1, 1, 1, 1, 1, 3, 3, 6, 6, 9, 9),
+                           B = c(2, 4, 5, 7, 8, 10,2, 4, 5, 7, 8, 10))
+fourfan.3.net <- network(fourfan.3.df, bipartite=TRUE, directed=FALSE)
+
+## From Stivala et al. (2024):
+##
+##   ... in this graph, the nodes in mode B contribute more to the
+##   total as each one (of the six) is involved in exactly one
+##   four-cycle (and hence raising to the power of α still
+##   contributes one to the sum), while of the four nodes in mode A,
+##   three are involved in only one four-cycle, while the fourth is
+##   involved in three four-cycles and hence contributes only 3^α ≈
+##   1.73205 (when α = 0.5).
+##
+summary(fourfan.3.net ~ b1np4c(0.5, TRUE) + b2np4c(0.5, TRUE))
 }
 \keyword{models}
