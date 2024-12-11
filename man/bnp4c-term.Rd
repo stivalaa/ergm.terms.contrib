@@ -41,7 +41,7 @@ thus the model is not a CEF model.
 
 This term can only be used with undirected bipartite networks.
 
-Note that allthough there is a \code{fixed} parameter, the terms are not yet able to handle a non-fixed \code{alpha} term so it must be set to the default value \code{fixed=TRUE}.
+Note that although there is a \code{fixed} parameter, the terms are not yet able to handle a non-fixed \code{alpha} term so it must be set to the default value \code{fixed=TRUE}.
 }
 
 \seealso{
@@ -52,7 +52,7 @@ Note that allthough there is a \code{fixed} parameter, the terms are not yet abl
 \references{
 Hunter, D. R. and M. S. Handcock (2006). Inference in curved exponential family models for networks. Journal of Computational and Graphical Statistics, 15: 565-583.
 
-Stivala, A., Wang., P., and Lomi, A. (2024). Improving exponential-family random graph models for bipartite networks. Unpublished manusript.
+Stivala, A., Wang., P., and Lomi, A. (2024). Improving exponential-family random graph models for bipartite networks. Unpublished manuscript.
 
 Wang, P., Sharpe, K., Robins, G. L., and Pattison, P. E. (2009). Exponential random graph (p*) models for affiliation networks. Social Networks. 31(1): 12-25.
 
