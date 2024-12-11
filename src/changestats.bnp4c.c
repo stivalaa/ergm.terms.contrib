@@ -113,7 +113,7 @@ static unsigned long num_fourcycles_node(Network *nwp, Vertex unode)  {
 
   Vertex vnode, wnode;
   Edge edge1, edge2;
-  int *visited = R_Calloc(N_NODES, int); /* list of visited nodes */
+  int *visited = R_Calloc(2*N_NODES, int); /* list of visited nodes */
   unsigned long fourcycle_count = 0;
 
   fprintf(stderr, "N_NODES = %d\n", N_NODES);
