@@ -116,6 +116,9 @@ static unsigned long num_fourcycles_node(Network *nwp, Vertex unode)  {
   int *visited = R_Calloc(N_NODES, int); /* list of visited nodes */
   unsigned long fourcycle_count = 0;
 
+  fprintf(stderr, "N_NODES = %d\n", N_NODES);
+  for (int x = 0; x < N_NODES; x++) fprintf(stderr, "%d\n",visited[x]);
+  
   /* this involves iterating over all nodes that are distance 2 from unode */
   /* In an undirected network, each edge is only stored as (tail, head) where
      tail < head, so to step through all edges of a node it is necessary
@@ -123,12 +126,14 @@ static unsigned long num_fourcycles_node(Network *nwp, Vertex unode)  {
   STEP_THROUGH_OUTEDGES(unode, edge1, vnode) {
     STEP_THROUGH_OUTEDGES(vnode, edge2, wnode) {
       if (wnode != unode && !visited[wnode]) {
+        fprintf(stderr, "x %d ", wnode);
         visited[wnode] = 1;
         fourcycle_count += n_choose_2(twopaths(nwp, unode, wnode));
       }
     }
     STEP_THROUGH_INEDGES(vnode, edge2, wnode) {
       if (wnode != unode && !visited[wnode]) {
+        fprintf(stderr, "x %d ", wnode);        
         visited[wnode] = 1;
         fourcycle_count += n_choose_2(twopaths(nwp, unode, wnode));
       }
@@ -137,12 +142,14 @@ static unsigned long num_fourcycles_node(Network *nwp, Vertex unode)  {
   STEP_THROUGH_INEDGES(unode, edge1, vnode) {
     STEP_THROUGH_OUTEDGES(vnode, edge2, wnode) {
       if (wnode != unode && !visited[wnode]) {
+        fprintf(stderr, "x %d ", wnode);
         visited[wnode] = 1;
         fourcycle_count += n_choose_2(twopaths(nwp, unode, wnode));
       }
     }
     STEP_THROUGH_INEDGES(vnode, edge2, wnode) {
       if (wnode != unode && !visited[wnode]) {
+        fprintf(stderr, "x %d ", wnode);
         visited[wnode] = 1;
         fourcycle_count += n_choose_2(twopaths(nwp, unode, wnode));
       }
