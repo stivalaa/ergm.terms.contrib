@@ -13,7 +13,7 @@
 ##
 ## These statistics are described in Stivala et al. (2024). The b1np4c
 ## and b2np4c statistics were first implemented in EstimNetDirected
-## (https://github.com/stivalaa/EstimNetDirected} as
+## (https://github.com/stivalaa/EstimNetDirected) as
 ## BipartiteFourCyclesNodePowerA and BipartiteFourCyclesNodePowerB.
 ##
 ## These statistics are only for undirected bipartite networks.
