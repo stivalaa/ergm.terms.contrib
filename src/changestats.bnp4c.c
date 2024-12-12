@@ -117,7 +117,7 @@ static unsigned long num_fourcycles_node(Network *nwp, Vertex unode)  {
   unsigned long fourcycle_count = 0;
 
   /*
-    Note it semems that the Vertex is an int from 1 .. N_NODES
+    Note it seems that the Vertex is an int from 1 .. N_NODES
      (R indexing from 1 rather than C indexing from 0)
      so we subtract one when indexing the visited array.
      This code depends on this being the case.
