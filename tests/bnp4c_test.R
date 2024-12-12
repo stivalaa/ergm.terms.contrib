@@ -331,11 +331,11 @@ test_that('bnp4c terms', {
   ##
   ##   ... in this graph, the nodes in mode B contribute more to the
   ##   total as each one (of the six) is involved in exactly one
-  ##   four-cycle (and hence raising to the power of α still
+  ##   four-cycle (and hence raising to the power of $\alpha$ still
   ##   contributes one to the sum), while of the four nodes in mode A,
   ##   three are involved in only one four-cycle, while the fourth is
-  ##   involved in three four-cycles and hence contributes only 3^α ≈
-  ##   1.73205 (when α = 0.5).
+  ##   involved in three four-cycles and hence contributes only
+  ##   $3^\alpha \approx 1.73205$ (when $\alpha=0.5$).
   ##
   expect_equal(as.vector(summary(fourfan3.net ~ b1np4c(0.5, TRUE))), 4.73205, tolerance=1e-05)
   expect_equal(as.vector(summary(fourfan3.net ~ b2np4c(0.5, TRUE))), 6)
