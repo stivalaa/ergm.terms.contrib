@@ -29,7 +29,7 @@ Note that allthough the default is \code{fixed=FALSE} the terms are not yet able
 }
 
 \seealso{
-  See also \code{\link[ergm]{gwnsp}} term. 
+  See also \code{\link[ergm]{gwnsp-ergmTerm}} term. 
 }
 
 
