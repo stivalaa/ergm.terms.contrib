@@ -346,4 +346,19 @@ test_that('bnp4c terms', {
 })
 
 
+test_that('bnp4c(1) is cycle(4)*2', {
+  ##
+  ## Both b1np4c(1) and b2np4c(1) are just 2*cycle(4)
+  ##
+
+  for (net in list(fourcycle.net, fourcycles3.net, fourcycles3.revmode.net,
+                  fourcycles6.net, tencycle.net, star.net, starB.net,
+                  fourfan3.net, fourfan.3.net)) {
+    expect_equal(as.vector(summary(net ~ b1np4c(1))),
+                 as.vector(summary(net ~ cycle(4)))*2)
+    expect_equal(as.vector(summary(net ~ b2np4c(1))),
+                 as.vector(summary(net ~ cycle(4)))*2)
+  }
+})
+
 
