@@ -283,7 +283,7 @@ D_CHANGESTAT_FN(d_b2np4c) {
       change += pow(vcount + delta, alpha) - pow(vcount, alpha);
     }
     CHANGE_STAT[0] += is_delete ? -change : change;
-    /* For a delete move, we added the edge at the start, now remove it again */
+    /* For a delete move, we deleted the edge at the start, now add it again */
     if (is_delete) {
      TOGGLE(TAIL(i), HEAD(i));
      if (!IS_UNDIRECTED_EDGE(b1, b2)) error("Edge must exist\n");
