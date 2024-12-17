@@ -88,14 +88,14 @@ summary(fourfan.3.net ~ b1np4c(0.5, TRUE) + b2np4c(0.5, TRUE))
 ## generate some graphs similar to 'zero.pos' in Fig. 5 and Fig. 6
 ## of Stivala et al. (2024), with the parameter for b1np4c zero
 ## and the parameter for b2np4c positive
-## (warning: takes about 30 seconds to run)
-system.time( g.zero.pos <- simulate(network(150, bipartite=100,
-                                           directed=FALSE) ~
-  edges + gwb1degree(.5,TRUE) + gwb2degree(.5, TRUE) + b2np4c(1/5),
-  coef=c(-6.0, 0.6, -0.5, 3.0),
-  nsim=100,
-  control = control.simulate(MCMC.burnin = 100000,
-                             MCMC.interval=10000)) )
+## (warning: takes about 2 minutes to run)
+system.time( g.zero.pos <- simulate(network(75, bipartite=50,
+                                            directed=FALSE) ~
+              edges + gwb1degree(.5,TRUE) + gwb2degree(.5, TRUE) + b2np4c(1/5),
+              coef=c(-5.0, 1.0, -0.5, 6.5),
+              nsim=100,
+              control = control.simulate(MCMC.burnin   = 100000,
+                                         MCMC.interval = 100000)) )
 
 ## plot graph statistics to check sufficient burnin and interval
 par(mfrow=c(2,3))
