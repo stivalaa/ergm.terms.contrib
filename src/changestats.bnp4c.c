@@ -211,6 +211,7 @@ D_CHANGESTAT_FN(d_b1np4c) {
   Vertex vnode, b1, b2;
   Edge edge;
   int i;
+  int is_delete;
 
   alpha = INPUT_PARAM[0];
 
@@ -218,6 +219,17 @@ D_CHANGESTAT_FN(d_b1np4c) {
   FOR_EACH_TOGGLE(i) {
     b1 = TAIL(i);
     b2 = HEAD(i);
+    is_delete = IS_UNDIRECTED_EDGE(b1, b2);
+    /* NOTE: For a delete move, we actually toggle the edge ourselves here so
+     * that the proposed edge is always NOT present for all the calculations
+     * as they involve counting two-paths and four-cycles, on the assumption
+     * that the proposed edge does not (yet) exist. We must therefore
+     * also add it back afterwards to fit in with the standard logic.
+     */
+    if (is_delete) {
+      TOGGLE(TAIL(i), HEAD(i));
+    }
+    if (IS_UNDIRECTED_EDGE(b1, b2)) error("Edge must not exist\n");
 
     /* Number of four-cycles the node is already involved in */
     count = num_fourcycles_node(nwp, b1);
@@ -234,6 +246,12 @@ D_CHANGESTAT_FN(d_b1np4c) {
       change += pow(vcount + delta, alpha) - pow(vcount, alpha);
     }
     CHANGE_STAT[0] += IS_UNDIRECTED_EDGE(b1, b2) ? -change : change;
+    /* For a delete move, we deleted the edge at the start, now add it again */
+    if (is_delete) {
+     TOGGLE(TAIL(i), HEAD(i));
+     if (!IS_UNDIRECTED_EDGE(b1, b2)) error("Edge must exist\n");
+    }
+
     TOGGLE_IF_MORE_TO_COME(i);
   }
   UNDO_PREVIOUS_TOGGLES(i);
@@ -256,7 +274,6 @@ D_CHANGESTAT_FN(d_b2np4c) {
     b1 = TAIL(i);
     b2 = HEAD(i);
     is_delete = IS_UNDIRECTED_EDGE(b1, b2);
-    if (i>0) fprintf(stderr, "b2 i = %d is_delete = %d\n", i, is_delete);//XXX
     /* NOTE: For a delete move, we actually toggle the edge ourselves here so
      * that the proposed edge is always NOT present for all the calculations
      * as they involve counting two-paths and four-cycles, on the assumption
@@ -288,7 +305,6 @@ D_CHANGESTAT_FN(d_b2np4c) {
      TOGGLE(TAIL(i), HEAD(i));
      if (!IS_UNDIRECTED_EDGE(b1, b2)) error("Edge must exist\n");
     }
-
 
     TOGGLE_IF_MORE_TO_COME(i);
   }
