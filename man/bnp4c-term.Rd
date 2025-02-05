@@ -23,7 +23,7 @@
 \code{b2np4c(alpha=0.5 fixed=TRUE) (binary) (bipartite) (undirected)}
 
 
-These statistics are described in Stivala et al. (2024).
+These statistics are described in Stivala et al. (2025).
 The \code{b1np4c} and \code{b2np4c} statistics were first implemented in EstimNetDirected (\url{https://github.com/stivalaa/EstimNetDirected}) as BipartiteFourCyclesNodePowerA and BipartiteFourCyclesNodePowerB.
 
 These statistics sum the number of four-cycles at each node in one
@@ -52,7 +52,7 @@ Note that although there is a \code{fixed} parameter, the terms are not yet able
 \references{
 Hunter, D. R. and M. S. Handcock (2006). Inference in curved exponential family models for networks. Journal of Computational and Graphical Statistics, 15: 565-583.
 
-Stivala, A., Wang., P., and Lomi, A. (2024). Improving exponential-family random graph models for bipartite networks. Unpublished manuscript.
+Stivala, A., Wang., P., and Lomi, A. (2025). Improving exponential-family random graph models for bipartite networks. arXiv preprint 2502.01892. \url{https://arxiv.org/abs/2502.01892}
 
 Wang, P., Sharpe, K., Robins, G. L., and Pattison, P. E. (2009). Exponential random graph (p*) models for affiliation networks. Social Networks. 31(1): 12-25.
 
@@ -72,7 +72,7 @@ fourfan.3.df <- data.frame(A = c(1, 1, 1, 1, 1, 1, 3, 3, 6, 6, 9, 9),
                            B = c(2, 4, 5, 7, 8, 10,2, 4, 5, 7, 8, 10))
 fourfan.3.net <- network(fourfan.3.df, bipartite=TRUE, directed=FALSE)
 
-## From Stivala et al. (2024):
+## From Stivala et al. (2025):
 ##
 ##   ... in this graph, the nodes in mode B contribute more to the
 ##   total as each one (of the six) is involved in exactly one
@@ -86,7 +86,7 @@ summary(fourfan.3.net ~ b1np4c(0.5, TRUE) + b2np4c(0.5, TRUE))
 
 \dontrun{
 ## generate some graphs similar to 'zero.pos' in Fig. 5 and Fig. 6
-## of Stivala et al. (2024), with the parameter for b1np4c zero
+## of Stivala et al. (2025), with the parameter for b1np4c zero
 ## and the parameter for b2np4c positive
 ## (warning: takes about 2 minutes to run)
 system.time( g.zero.pos <- simulate(network(75, bipartite=50,
@@ -107,7 +107,7 @@ plot(summary(g.zero.pos ~ b1np4c(1/5)))
 plot(summary(g.zero.pos ~ cycle(4)))
 
 ## plot visualization of one graph similar to
-## Fig. 6 of Stivala et al. (2024)
+## Fig. 6 of Stivala et al. (2025)
 i <- 88
 N.network <- network.size(g.zero.pos[[i]])
 N.b1 <- get.network.attribute(g.zero.pos[[i]], 'bipartite')
