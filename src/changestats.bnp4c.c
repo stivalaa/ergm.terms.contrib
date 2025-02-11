@@ -17,7 +17,7 @@
  * b1np4c is for nodes in the first bipartition, and b2np4c is for nodes
  * in the second bipartition.
  *
- * These statistics are described in Stivala et al. (2024). The b1np4c
+ * These statistics are described in Stivala et al. (2025). The b1np4c
  * and b2np4c statistics were first implemented in EstimNetDirected
  * (https://github.com/stivalaa/EstimNetDirected) as
  * BipartiteFourCyclesNodePowerA and BipartiteFourCyclesNodePowerB.
@@ -27,9 +27,9 @@
  *
  * References:
  *
- * Stivala, A., Wang., P., and Lomi, A. (2024). Improving
+ * Stivala, A., Wang., P., and Lomi, A. (2025). Improving
  * exponential-family random graph models for bipartite
- * networks. Unpublished manuscript.
+ * networks. arXiv preprint 2502.01892. https://arxiv.org/abs/2502.01892
  *
  * Wilson, J. D., Denny, M. J., Bhamidi, S., Cranmer, S. J., &
  * Desmarais, B. A. (2017). Stochastic weighted graphs: Flexible model

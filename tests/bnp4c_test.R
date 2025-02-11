@@ -11,7 +11,7 @@
 ## b1np4c is for nodes in the first bipartition, and b2np4c is for nodes
 ## in the second bipartition.
 ##
-## These statistics are described in Stivala et al. (2024). The b1np4c
+## These statistics are described in Stivala et al. (2025). The b1np4c
 ## and b2np4c statistics were first implemented in EstimNetDirected
 ## (https://github.com/stivalaa/EstimNetDirected) as
 ## BipartiteFourCyclesNodePowerA and BipartiteFourCyclesNodePowerB.
@@ -19,15 +19,15 @@
 ## These statistics are only for undirected bipartite networks.
 ##
 ## For more details on the statistics and test data see
-## Stivala et al. (2024) and
+## Stivala et al. (2025) and
 ## https://github.com/stivalaa/EstimNetDirected/tree/master/Test/TestChangeStatsBipartite/
 ##
 ##
 ## References:
 ##
-## Stivala, A., Wang., P., and Lomi, A. (2024). Improving
+## Stivala, A., Wang., P., and Lomi, A. (2025). Improving
 ## exponential-family random graph models for bipartite
-## networks. Unpublished manusript.
+## networks. arXiv preprint 2502.01892. https://arxiv.org/abs/2502.01892
 ##
 ## Wilson, J. D., Denny, M. J., Bhamidi, S., Cranmer, S. J., &
 ## Desmarais, B. A. (2017). Stochastic weighted graphs: Flexible model
@@ -284,7 +284,7 @@ test_that('bnp4c terms input validation', {
 test_that('bnp4c terms', {
   ##
   ## Tests on the example/test networks.
-  ## See Table 4 of Stivala et al. (2024) and Tests/TestChangeStatsBipartite/
+  ## See Table 4 of Stivala et al. (2025) and Tests/TestChangeStatsBipartite/
   ## in EstimNetDirected GitHub repository.
   ##
 
@@ -327,7 +327,7 @@ test_that('bnp4c terms', {
 
   ## Four-fan-3
   ##
-  ## From Stivala et al. (2024):
+  ## From Stivala et al. (2025):
   ##
   ##   ... in this graph, the nodes in mode B contribute more to the
   ##   total as each one (of the six) is involved in exactly one
