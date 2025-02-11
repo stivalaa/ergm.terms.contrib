@@ -154,7 +154,7 @@ InitErgmTerm.b1np4c <- function(nw, arglist, ...) {
 
 #' @templateVar name b1np4c
 #' @template ergmTerm-rdname
-#' @aliases b2np4c
+#' @aliases b2np4c-ergmTerm
 #' @usage
 #' #binary: b2np4c(alpha=0.5, fixed=TRUE)
 #'

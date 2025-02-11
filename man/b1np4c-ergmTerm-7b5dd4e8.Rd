@@ -4,7 +4,7 @@
 \alias{b1np4c-ergmTerm}
 \alias{InitErgmTerm.b1np4c}
 \alias{InitErgmTerm.b2np4c}
-\alias{b2np4c}
+\alias{b2np4c-ergmTerm}
 \title{Bipartite nodepower four-cycles terms (b1np4c and b2np4c)}
 \usage{
 #binary: b1np4c(alpha=0.5, fixed=TRUE)
