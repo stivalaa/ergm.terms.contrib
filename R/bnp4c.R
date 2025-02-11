@@ -24,57 +24,54 @@
 #' is fixed. Currently this parameter must be set to TRUE.
 #'
 #' @details
-#' 
+#'
 #' These statistics are described in Stivala et al. (2025).  The
 #' \code{b1np4c} and \code{b2np4c} statistics were first implemented
 #' in EstimNetDirected
 #' (\url{https://github.com/stivalaa/EstimNetDirected}) as
 #' BipartiteFourCyclesNodePowerA and BipartiteFourCyclesNodePowerB.
-#' 
+#'
 #' These statistics sum the number of four-cycles at each node in one
 #' bipartition (the first bipartition for \code{b1np4c} and the second
 #' bipartition for \code{b2np4c}) raised to the power \eqn{\alpha} (\eqn{0 <
 #'   \alpha \leq 1}). That is, the count at each node is raised to the power
 #' \eqn{\alpha}, and then they are summed. In the terminology of
 #' Wilson et al. (2017), this is an "\eqn{\alpha}-inside" weighting.
-#' 
+#'
 #' The argument \code{fixed} indicates whether the parameter
 #' \code{alpha} is to be fit as a curved exponential-family model (see
 #' Hunter and Handcock, 2006). Currently, the fixed argument must be
 #' set to TRUE, which means the weight parameter \code{alpha} is not
 #' separately estimated and thus the model is not a CEF model.
-#' 
+#'
 #' This term can only be used with undirected bipartite networks.
-#' 
+#'
 #' Note that although there is a \code{fixed} parameter, the terms are
 #' not yet able to handle a non-fixed \code{alpha} term so it must be
 #' set to the default value \code{fixed=TRUE}.
 #'
-#' @seealso
-#' See also \code{\link[ergm]{gwb1dsp-ergmTerm}} term.
-#'
 #' @references
-#' 
+#'
 #' Hunter, D. R. and M. S. Handcock (2006). Inference in curved
 #' exponential family models for networks. Journal of Computational
 #' and Graphical Statistics, 15: 565-583.
-#' 
+#'
 #' Stivala, A., Wang., P., and Lomi, A. (2025). Improving
 #' exponential-family random graph models for bipartite
 #' networks. arXiv preprint
 #' 2502.01892. \url{https://arxiv.org/abs/2502.01892}
-#' 
+#'
 #' Wang, P., Sharpe, K., Robins, G. L., and Pattison,
 #' P. E. (2009). Exponential random graph (p*) models for affiliation
 #' networks. Social Networks. 31(1): 12-25.
-#' 
+#'
 #' Wilson, J. D., Denny, M. J., Bhamidi, S., Cranmer, S. J., &
 #' Desmarais, B. A. (2017). Stochastic weighted graphs: Flexible model
 #' specification and simulation. Social Networks, 49, 37-47.
 #'
 #' @author
 #' Alex Stivala \email{alex.d.stivala@gmail.com}
-#' 
+#'
 #' @examples
 #'
 #' library(ergm.terms.contrib)
@@ -83,7 +80,7 @@
 #' fourfan.3.df <- data.frame(A = c(1, 1, 1, 1, 1, 1, 3, 3, 6, 6, 9, 9),
 #'                            B = c(2, 4, 5, 7, 8, 10,2, 4, 5, 7, 8, 10))
 #' fourfan.3.net <- network(fourfan.3.df, bipartite=TRUE, directed=FALSE)
-#' 
+#'
 #' ## From Stivala et al. (2025):
 #' ##
 #' ##   ... in this graph, the nodes in mode B contribute more to the
@@ -95,7 +92,7 @@
 #' ##   $3^\alpha \approx 1.73205$ (when $\alpha=0.5$).
 #' ##
 #' summary(fourfan.3.net ~ b1np4c(0.5, TRUE) + b2np4c(0.5, TRUE))
-#' 
+#'
 #' \dontrun{
 #' ## generate some graphs similar to 'zero.pos' in Fig. 5 and Fig. 6
 #' ## of Stivala et al. (2025), with the parameter for b1np4c zero
@@ -108,7 +105,7 @@
 #'               nsim=100,
 #'               control = control.simulate(MCMC.burnin   = 100000,
 #'                                          MCMC.interval = 100000)) )
-#' 
+#'
 #' ## plot graph statistics to check sufficient burnin and interval
 #' par(mfrow=c(2,3))
 #' plot(summary(g.zero.pos ~ edges))
@@ -117,7 +114,7 @@
 #' plot(summary(g.zero.pos ~ b2np4c(1/5)))
 #' plot(summary(g.zero.pos ~ b1np4c(1/5)))
 #' plot(summary(g.zero.pos ~ cycle(4)))
-#' 
+#'
 #' ## plot visualization of one graph similar to
 #' ## Fig. 6 of Stivala et al. (2025)
 #' i <- 88
@@ -159,7 +156,7 @@ InitErgmTerm.b1np4c <- function(nw, arglist, ...) {
 #' @template ergmTerm-rdname
 #' @aliases b2np4c
 #' @usage
-#' #binary: b1np4c(alpha=0.5 fixed=TRUE)
+#' #binary: b2np4c(alpha=0.5 fixed=TRUE)
 #'
 
 InitErgmTerm.b2np4c <- function(nw, arglist, ...) {
