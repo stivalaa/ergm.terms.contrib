@@ -9,7 +9,7 @@
 #'   bipartite networks.
 #'
 #' @usage
-#' #binary: b1np4c(alpha=0.5 fixed=TRUE)
+#' #binary: b1np4c(alpha=0.5, fixed=TRUE)
 #'
 #' @template ergmTerm-general
 #'
@@ -156,7 +156,7 @@ InitErgmTerm.b1np4c <- function(nw, arglist, ...) {
 #' @template ergmTerm-rdname
 #' @aliases b2np4c
 #' @usage
-#' #binary: b2np4c(alpha=0.5 fixed=TRUE)
+#' #binary: b2np4c(alpha=0.5, fixed=TRUE)
 #'
 
 InitErgmTerm.b2np4c <- function(nw, arglist, ...) {

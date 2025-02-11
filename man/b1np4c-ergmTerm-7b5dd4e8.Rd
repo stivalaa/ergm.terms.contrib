@@ -7,9 +7,9 @@
 \alias{b2np4c}
 \title{Bipartite nodepower four-cycles terms (b1np4c and b2np4c)}
 \usage{
-#binary: b1np4c(alpha=0.5 fixed=TRUE)
+#binary: b1np4c(alpha=0.5, fixed=TRUE)
 
-#binary: b2np4c(alpha=0.5 fixed=TRUE)
+#binary: b2np4c(alpha=0.5, fixed=TRUE)
 }
 \arguments{
 \item{alpha}{value of \eqn{\alpha}, the power to which the
