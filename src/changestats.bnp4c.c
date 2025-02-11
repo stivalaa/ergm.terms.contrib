@@ -206,56 +206,48 @@ static unsigned long change_fourcycles(Network *nwp, Vertex i, Vertex j) {
  */
 
 
-D_CHANGESTAT_FN(d_b1np4c) {
+C_CHANGESTAT_FN(c_b1np4c) {
   double change, alpha, delta;
   unsigned long count, vcount;
-  Vertex vnode, b1, b2;
-  Edge edge;
-  int i;
+  Vertex b1, b2;
   int is_delete;
 
   alpha = INPUT_PARAM[0];
 
-  ZERO_ALL_CHANGESTATS(i);
-  FOR_EACH_TOGGLE(i) {
-    b1 = TAIL(i);
-    b2 = HEAD(i);
-    is_delete = IS_UNDIRECTED_EDGE(b1, b2);
-    /* NOTE: For a delete move, we actually toggle the edge ourselves here so
-     * that the proposed edge is always NOT present for all the calculations
-     * as they involve counting two-paths and four-cycles, on the assumption
-     * that the proposed edge does not (yet) exist. We must therefore
-     * also add it back afterwards to fit in with the standard logic.
-     */
-    if (is_delete) {
-      TOGGLE(TAIL(i), HEAD(i));
-    }
-    if (IS_UNDIRECTED_EDGE(b1, b2)) error("Edge must not exist\n");
-
-    /* Number of four-cycles the node is already involved in */
-    count = num_fourcycles_node(nwp, b1);
-
-    /* change statistic for four-cycles */
-    delta = change_fourcycles(nwp, b1, b2);
-    change = pow(count + delta, alpha) - pow(count, alpha);
-
-    /* add contribution from sum over neighbours of b2 */
-    /* see comment above: the degree of a b2 is equivalent to its indegree */
-    STEP_THROUGH_INEDGES(b2, edge, vnode) {
-      vcount = num_fourcycles_node(nwp, vnode);
-      delta = twopaths(nwp, vnode, b1);
-      change += pow(vcount + delta, alpha) - pow(vcount, alpha);
-    }
-    CHANGE_STAT[0] += IS_UNDIRECTED_EDGE(b1, b2) ? -change : change;
-    /* For a delete move, we deleted the edge at the start, now add it again */
-    if (is_delete) {
-     TOGGLE(TAIL(i), HEAD(i));
-     if (!IS_UNDIRECTED_EDGE(b1, b2)) error("Edge must exist\n");
-    }
-
-    TOGGLE_IF_MORE_TO_COME(i);
+  b1 = tail;
+  b2 = head;
+  is_delete = IS_UNDIRECTED_EDGE(b1, b2);
+  /* NOTE: For a delete move, we actually toggle the edge ourselves here so
+   * that the proposed edge is always NOT present for all the calculations
+   * as they involve counting two-paths and four-cycles, on the assumption
+   * that the proposed edge does not (yet) exist. We must therefore
+   * also add it back afterwards to fit in with the standard logic.
+   */
+  if (is_delete) {
+    TOGGLE(b1, b2);
   }
-  UNDO_PREVIOUS_TOGGLES(i);
+  if (IS_UNDIRECTED_EDGE(b1, b2)) error("Edge must not exist\n");
+
+  /* Number of four-cycles the node is already involved in */
+  count = num_fourcycles_node(nwp, b1);
+
+  /* change statistic for four-cycles */
+  delta = change_fourcycles(nwp, b1, b2);
+  change = pow(count + delta, alpha) - pow(count, alpha);
+
+  /* add contribution from sum over neighbours of b2 */
+  /* see comment above: the degree of a b2 is equivalent to its indegree */
+  EXEC_THROUGH_EDGES(b2, edge, vnode,  { /* step through edges of b2 */
+    vcount = num_fourcycles_node(nwp, vnode);
+    delta = twopaths(nwp, vnode, b1);
+    change += pow(vcount + delta, alpha) - pow(vcount, alpha);
+  });
+  CHANGE_STAT[0] += IS_UNDIRECTED_EDGE(b1, b2) ? -change : change;
+  /* For a delete move, we deleted the edge at the start, now add it again */
+  if (is_delete) {
+    TOGGLE(b1, b2);
+    if (!IS_UNDIRECTED_EDGE(b1, b2)) error("Edge must exist\n");
+  }
 }
 
 
