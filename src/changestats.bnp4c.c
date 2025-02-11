@@ -40,7 +40,7 @@
 #include <assert.h>
 
 #include "ergm_changestat.h"
-
+#include "ergm_storage.h"
 
 /*****************************************************************************
  *
@@ -105,18 +105,21 @@ static unsigned int twopaths(Network *nwp, Vertex i, Vertex j)  {
 }
 
 
-
 /*
  * number of four-cycles that node unode is involved in
  *
+ * the visited parameter is an array of N_NODES int allocated by caller
  */
-static unsigned long num_fourcycles_node(Network *nwp, Vertex unode)  {
+
+static unsigned long num_fourcycles_node(Network *nwp, Vertex unode,
+                                         int *visited)  {
   /* Note Network *nwp parameter has to be called nwp for use of macros */
 
   Vertex vnode, wnode;
   Edge edge1, edge2;
-  int *visited = R_Calloc(N_NODES, int); /* list of visited nodes */
   unsigned long fourcycle_count = 0;
+
+  memset(visited, 0, N_NODES);
 
   /*
     Note it seems that the Vertex is an int from 1 .. N_NODES
@@ -157,7 +160,6 @@ static unsigned long num_fourcycles_node(Network *nwp, Vertex unode)  {
       }
     }
   }
-  R_Free(visited);
   return fourcycle_count;
 }
 
@@ -206,11 +208,27 @@ static unsigned long change_fourcycles(Network *nwp, Vertex i, Vertex j) {
  */
 
 
+
+/* Initializer: allocate private storage. */
+I_CHANGESTAT_FN(i_b1np4c) {
+  ALLOC_STORAGE(N_NODES, int, visited); /* array of visited node flags */
+  /* Note ALLOC_STORAGE expands to R_Calloc() so zeroes the array
+     and we depend on this */
+}
+
+
+
+/*
+ * Change statistic function for b1np4c
+ */
 C_CHANGESTAT_FN(c_b1np4c) {
   double change, alpha, delta;
   unsigned long count, vcount;
   Vertex b1, b2;
   int is_delete;
+
+  GET_STORAGE(int, visited); /* Obtain a pointer to private storage
+                                and cast it to the correct type. */
 
   alpha = INPUT_PARAM[0];
 
@@ -229,7 +247,7 @@ C_CHANGESTAT_FN(c_b1np4c) {
   if (IS_UNDIRECTED_EDGE(b1, b2)) error("Edge must not exist\n");
 
   /* Number of four-cycles the node is already involved in */
-  count = num_fourcycles_node(nwp, b1);
+  count = num_fourcycles_node(nwp, b1, visited);
 
   /* change statistic for four-cycles */
   delta = change_fourcycles(nwp, b1, b2);
@@ -237,7 +255,7 @@ C_CHANGESTAT_FN(c_b1np4c) {
 
   /* add contribution from sum over neighbours of b2 */
   EXEC_THROUGH_EDGES(b2, edge, vnode,  { /* step through edges of b2 */
-    vcount = num_fourcycles_node(nwp, vnode);
+    vcount = num_fourcycles_node(nwp, vnode, visited);
     delta = twopaths(nwp, vnode, b1);
     change += pow(vcount + delta, alpha) - pow(vcount, alpha);
   });
@@ -251,11 +269,16 @@ C_CHANGESTAT_FN(c_b1np4c) {
 
 
 
+/*
+ * Change statistic function for b2np4c
+ */
 C_CHANGESTAT_FN(c_b2np4c) {
   double change, alpha, delta;
   unsigned long count, vcount;
   Vertex b1, b2;
   int is_delete;
+  GET_STORAGE(int, visited); /* Obtain a pointer to private storage
+                                and cast it to the correct type. */
 
   alpha = INPUT_PARAM[0];
 
@@ -274,7 +297,7 @@ C_CHANGESTAT_FN(c_b2np4c) {
   if (IS_UNDIRECTED_EDGE(b1, b2)) error("Edge must not exist\n");
 
   /* Number of four-cycles the node is already involved in */
-  count = num_fourcycles_node(nwp, b2);
+  count = num_fourcycles_node(nwp, b2, visited);
 
   /* change statistic for four-cycles */
   delta = change_fourcycles(nwp, b1, b2);
@@ -282,7 +305,7 @@ C_CHANGESTAT_FN(c_b2np4c) {
 
   /* add contribution from sum over neighbours of b1 */
   EXEC_THROUGH_EDGES(b1, edge, vnode, { /* step through edges of b1 */
-    vcount = num_fourcycles_node(nwp, vnode);
+    vcount = num_fourcycles_node(nwp, vnode, visited);
     delta = twopaths(nwp, vnode, b2);
     change += pow(vcount + delta, alpha) - pow(vcount, alpha);
   })
@@ -293,3 +316,6 @@ C_CHANGESTAT_FN(c_b2np4c) {
     if (!IS_UNDIRECTED_EDGE(b1, b2)) error("Edge must exist\n");
   }
 }
+
+
+/* Finalizer: free storage */
