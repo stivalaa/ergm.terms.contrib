@@ -133,25 +133,36 @@ static unsigned int twopaths(Network *nwp, Vertex i, Vertex j)  {
  *
  * The bnp4c_storage_t sto parameter containing the visited working storage and
  * the memoization cache for the result is allocated by the caller.
+ *
+ * The return value is signed (not unsigned) to avoid problems with
+ * signed/unsigned in the memoization which is signed in order to use
+ * NOT_SET = -1 since any non-negative integer could be a valid count.
+ * The return value from this function is always non-negative, however.
  */
 
-static unsigned long num_fourcycles_node(Network *nwp, Vertex unode,
-                                         bnp4c_storage_t *sto)  {
+static long num_fourcycles_node(Network *nwp, Vertex unode,
+				bnp4c_storage_t *sto)  {
   /* Note Network *nwp parameter has to be called nwp for use of macros */
 
   Vertex vnode, wnode;
   Edge edge1, edge2;
-  unsigned long fourcycle_count = 0;
+  long fourcycle_count = 0;
   int *visited = sto->visited;
-
-  memset(visited, 0, N_NODES*sizeof(visited[0]));
-
+  
   /*
     Note it seems that the Vertex is an int from 1 .. N_NODES
      (R indexing from 1 rather than C indexing from 0)
-     so we subtract one when indexing the visited array.
+     so we subtract one when indexing the visited and fourcycle_count arrays.
      This code depends on this being the case.
   */
+
+  /* memoization: return cached value if set */
+  if (sto->fourcycle_count[unode-1] != NOT_SET) {
+    return sto->fourcycle_count[unode-1];
+  }
+  
+  memset(visited, 0, N_NODES*sizeof(visited[0]));
+
   
   /* this involves iterating over all nodes that are distance 2 from unode */
   /* In an undirected network, each edge is only stored as (tail, head) where
@@ -185,6 +196,7 @@ static unsigned long num_fourcycles_node(Network *nwp, Vertex unode,
       }
     }
   }
+  sto->fourcycle_count[unode-1] = fourcycle_count; /* memoization */
   return fourcycle_count;
 }
 
@@ -239,13 +251,12 @@ I_CHANGESTAT_FN(i_b1np4c) {
   ALLOC_STORAGE(1, bnp4c_storage_t, sto1);
   sto1->visited = R_Calloc(N_NODES, int);
   sto1->fourcycle_count = R_Calloc(N_NODES, long);
-  memset(sto1->fourcycle_count, NOT_SET, sizeof(sto1->fourcycle_count[0]*N_NODES));
 }
+
 I_CHANGESTAT_FN(i_b2np4c) {
   ALLOC_STORAGE(1, bnp4c_storage_t, sto2);
   sto2->visited = R_Calloc(N_NODES, int);
   sto2->fourcycle_count = R_Calloc(N_NODES, long);
-  memset(sto2->fourcycle_count, NOT_SET, sizeof(sto2->fourcycle_count[0]*N_NODES));
 }
 
 
@@ -254,12 +265,17 @@ I_CHANGESTAT_FN(i_b2np4c) {
  */
 C_CHANGESTAT_FN(c_b1np4c) {
   double change, alpha, delta;
-  unsigned long count, vcount;
+  long count, vcount;
   Vertex b1, b2;
   int is_delete;
 
   GET_STORAGE(bnp4c_storage_t, sto1); /* Obtain a pointer to private storage
                                        and cast it to the correct type. */
+  /* initialize nodewise fourcycle count cache to NOT_SET */
+  /* initialize nodewise fourcycle count cache to NOT_SET */
+  for (int i = 0; i < N_NODES; i++) {
+    sto1->fourcycle_count[i] = NOT_SET;
+  }
 
   alpha = INPUT_PARAM[0];
 
@@ -306,12 +322,16 @@ C_CHANGESTAT_FN(c_b1np4c) {
 
 C_CHANGESTAT_FN(c_b2np4c) {
   double change, alpha, delta;
-  unsigned long count, vcount;
+  long count, vcount;
   Vertex b1, b2;
   int is_delete;
 
   GET_STORAGE(bnp4c_storage_t, sto2); /* Obtain a pointer to private storage
                                        and cast it to the correct type. */
+  /* initialize nodewise fourcycle count cache to NOT_SET */
+  for (int i = 0; i < N_NODES; i++) {
+    sto2->fourcycle_count[i] = NOT_SET;
+  }
 
   alpha = INPUT_PARAM[0];
 
