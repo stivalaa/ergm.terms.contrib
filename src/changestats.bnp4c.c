@@ -212,9 +212,11 @@ static unsigned long change_fourcycles(Network *nwp, Vertex i, Vertex j) {
 /* Initializer: allocate private storage. */
 I_CHANGESTAT_FN(i_b1np4c) {
   ALLOC_STORAGE(N_NODES, int, visited1); /* array of visited node flags */
+  (void)visited1; /* only used in c_b1np4c; suppress unused var warning */
 }
 I_CHANGESTAT_FN(i_b2np4c) {
   ALLOC_STORAGE(N_NODES, int, visited2); /* array of visited node flags */
+  (void)visited2; /* only used in c_b2np4c; suppress unused var warning */
 }
 
 
