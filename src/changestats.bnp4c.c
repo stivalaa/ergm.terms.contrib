@@ -211,11 +211,11 @@ static unsigned long change_fourcycles(Network *nwp, Vertex i, Vertex j) {
 
 /* Initializer: allocate private storage. */
 I_CHANGESTAT_FN(i_b1np4c) {
-  ALLOC_STORAGE(N_NODES, int, visited); /* array of visited node flags */
-  /* Note ALLOC_STORAGE expands to R_Calloc() so zeroes the array
-     and we depend on this */
+  ALLOC_STORAGE(N_NODES, int, visited1); /* array of visited node flags */
 }
-
+I_CHANGESTAT_FN(i_b2np4c) {
+  ALLOC_STORAGE(N_NODES, int, visited2); /* array of visited node flags */
+}
 
 
 /*
@@ -227,8 +227,8 @@ C_CHANGESTAT_FN(c_b1np4c) {
   Vertex b1, b2;
   int is_delete;
 
-  GET_STORAGE(int, visited); /* Obtain a pointer to private storage
-                                and cast it to the correct type. */
+  GET_STORAGE(int, visited1); /* Obtain a pointer to private storage
+                                       and cast it to the correct type. */
 
   alpha = INPUT_PARAM[0];
 
@@ -247,7 +247,7 @@ C_CHANGESTAT_FN(c_b1np4c) {
   if (IS_UNDIRECTED_EDGE(b1, b2)) error("Edge must not exist\n");
 
   /* Number of four-cycles the node is already involved in */
-  count = num_fourcycles_node(nwp, b1, visited);
+  count = num_fourcycles_node(nwp, b1, visited1);
 
   /* change statistic for four-cycles */
   delta = change_fourcycles(nwp, b1, b2);
@@ -255,7 +255,7 @@ C_CHANGESTAT_FN(c_b1np4c) {
 
   /* add contribution from sum over neighbours of b2 */
   EXEC_THROUGH_EDGES(b2, edge, vnode,  { /* step through edges of b2 */
-    vcount = num_fourcycles_node(nwp, vnode, visited);
+    vcount = num_fourcycles_node(nwp, vnode, visited1);
     delta = twopaths(nwp, vnode, b1);
     change += pow(vcount + delta, alpha) - pow(vcount, alpha);
   });
@@ -272,13 +272,15 @@ C_CHANGESTAT_FN(c_b1np4c) {
 /*
  * Change statistic function for b2np4c
  */
+
 C_CHANGESTAT_FN(c_b2np4c) {
   double change, alpha, delta;
   unsigned long count, vcount;
   Vertex b1, b2;
   int is_delete;
-  GET_STORAGE(int, visited); /* Obtain a pointer to private storage
-                                and cast it to the correct type. */
+
+  GET_STORAGE(int, visited2); /* Obtain a pointer to private storage
+                                       and cast it to the correct type. */
 
   alpha = INPUT_PARAM[0];
 
@@ -297,7 +299,7 @@ C_CHANGESTAT_FN(c_b2np4c) {
   if (IS_UNDIRECTED_EDGE(b1, b2)) error("Edge must not exist\n");
 
   /* Number of four-cycles the node is already involved in */
-  count = num_fourcycles_node(nwp, b2, visited);
+  count = num_fourcycles_node(nwp, b2, visited2);
 
   /* change statistic for four-cycles */
   delta = change_fourcycles(nwp, b1, b2);
@@ -305,7 +307,7 @@ C_CHANGESTAT_FN(c_b2np4c) {
 
   /* add contribution from sum over neighbours of b1 */
   EXEC_THROUGH_EDGES(b1, edge, vnode, { /* step through edges of b1 */
-    vcount = num_fourcycles_node(nwp, vnode, visited);
+    vcount = num_fourcycles_node(nwp, vnode, visited2);
     delta = twopaths(nwp, vnode, b2);
     change += pow(vcount + delta, alpha) - pow(vcount, alpha);
   })
@@ -318,4 +320,8 @@ C_CHANGESTAT_FN(c_b2np4c) {
 }
 
 
-/* Finalizer: free storage */
+/* It seems there is no need to free private storage with a Finalizer
+   (f_) function, it is done by statnet elsewhwere (see point 9
+   ModelDestroy() is called in the API definition:
+   https://cran.r-project.org/web/packages/ergm/vignettes/Terms-API.html
+*/
