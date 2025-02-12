@@ -237,14 +237,14 @@ static unsigned long change_fourcycles(Network *nwp, Vertex i, Vertex j) {
 /* Initializer: allocate private storage. */
 I_CHANGESTAT_FN(i_b1np4c) {
   ALLOC_STORAGE(1, bnp4c_storage_t, sto1);
-  sto1->visited = R_Calloc(N_NODES, sizeof(int));
-  sto1->fourcycle_count = R_Calloc(N_NODES, sizeof(long));
+  sto1->visited = R_Calloc(N_NODES, int);
+  sto1->fourcycle_count = R_Calloc(N_NODES, long);
   memset(sto1->fourcycle_count, NOT_SET, sizeof(sto1->fourcycle_count[0]*N_NODES));
 }
 I_CHANGESTAT_FN(i_b2np4c) {
   ALLOC_STORAGE(1, bnp4c_storage_t, sto2);
-  sto2->visited = R_Calloc(N_NODES, sizeof(int));
-  sto2->fourcycle_count = R_Calloc(N_NODES, sizeof(long));
+  sto2->visited = R_Calloc(N_NODES, int);
+  sto2->fourcycle_count = R_Calloc(N_NODES, long);
   memset(sto2->fourcycle_count, NOT_SET, sizeof(sto2->fourcycle_count[0]*N_NODES));
 }
 
@@ -363,13 +363,13 @@ C_CHANGESTAT_FN(c_b2np4c) {
 */
 
 F_CHANGESTAT_FN(f_b1np4c) {
-  GET_STORAGE(bn4pc_storage_t, sto1);
-  R_Free(sto->visited);
-  R_Free(sto->fourcycle_count);
+  GET_STORAGE(bnp4c_storage_t, sto1);
+  R_Free(sto1->visited);
+  R_Free(sto1->fourcycle_count);
 }
 
 F_CHANGESTAT_FN(f_b2np4c) {
-  GET_STORAGE(bn4pc_storage_t, sto2);
-  R_Free(sto->visited);
-  R_Free(sto->fourcycle_count);
+  GET_STORAGE(bnp4c_storage_t, sto2);
+  R_Free(sto2->visited);
+  R_Free(sto2->fourcycle_count);
 }
