@@ -119,7 +119,7 @@ static unsigned long num_fourcycles_node(Network *nwp, Vertex unode,
   Edge edge1, edge2;
   unsigned long fourcycle_count = 0;
 
-  memset(visited, 0, N_NODES);
+  memset(visited, 0, N_NODES*sizeof(int));
 
   /*
     Note it seems that the Vertex is an int from 1 .. N_NODES
@@ -211,6 +211,7 @@ static unsigned long change_fourcycles(Network *nwp, Vertex i, Vertex j) {
 
 /* Initializer: allocate private storage. */
 I_CHANGESTAT_FN(i_b1np4c) {
+  fprintf(stderr, "XXX %d\n", N_NODES);
   ALLOC_STORAGE(N_NODES, int, visited1); /* array of visited node flags */
 }
 I_CHANGESTAT_FN(i_b2np4c) {
