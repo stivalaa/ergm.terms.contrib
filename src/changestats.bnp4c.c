@@ -44,6 +44,21 @@
 
 /*****************************************************************************
  *
+ * type definitions
+ *
+ *****************************************************************************/
+
+/* private storage struct for b1np4c and b2np4c */
+typedef struct bnp4c_storage_s {
+  int            *visited;         /* visited flag for each node
+                                      (working storage) */
+  unsigned long  *fourcycle_count; /* number of four-cycles at each node
+                                      (memoization cache) */
+} bnp4c_storage_t;
+
+
+/*****************************************************************************
+ *
  * local functions
  *
  *****************************************************************************/
@@ -322,8 +337,25 @@ C_CHANGESTAT_FN(c_b2np4c) {
 }
 
 
-/* It seems there is no need to free private storage with a Finalizer
-   (f_) function, it is done by statnet elsewhwere (see point 9
-   ModelDestroy() is called in the API definition:
+/* Finalizer: free private storage. */
+
+/* There is no need to free private storage allocated by ALLOC_STORAGE
+   with a Finalizer (f_) function, it is done by statnet elsewhwere
+   (see point 9 ModelDestroy() is called in the API definition:
    https://cran.r-project.org/web/packages/ergm/vignettes/Terms-API.html
+
+   However we do need to free the storage inside this that we allocated
+   in the Initializer functions.
 */
+
+F_CHANGESTAT_FN(f_b1np4c) {
+  GET_STORAGE(bn4pc_storage_t, sto1);
+  R_Free(sto->visited);
+  R_Free(sto->fourcycle_count);
+}
+
+F_CHANGESTAT_FN(f_b2np4c) {
+  GET_STORAGE(bn4pc_storage_t, sto2);
+  R_Free(sto->visited);
+  R_Free(sto->fourcycle_count);
+}
