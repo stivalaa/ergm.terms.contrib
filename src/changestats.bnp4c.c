@@ -322,15 +322,6 @@ U_CHANGESTAT_FN(u_b2np4c) {
   b2 = head;
   is_delete = edgestate;
 
-  /* NOTE: For a delete move, we actually toggle the edge ourselves here so
-   * that the proposed edge is always NOT present for all the calculations
-   * as they involve counting two-paths and four-cycles, on the assumption
-   * that the proposed edge does not (yet) exist. We must therefore
-   * also add it back afterwards to fit in with the standard logic.
-   */
-  if (is_delete) {
-    TOGGLE(b1, b2);
-  }
   if (IS_UNDIRECTED_EDGE(b1, b2)) error("Edge must not exist\n");
 
   /* change statistic for four-cycles */
@@ -347,12 +338,6 @@ U_CHANGESTAT_FN(u_b2np4c) {
      fprintf(stderr, "u_b2np4c for %d added %ld to get %lu\n",vnode, delta,sto2->fourcycle_count[vnode-1]);
   });
   
-
-  /* For a delete move, we deleted the edge at the start, now add it again */
-  if (is_delete) {
-    TOGGLE(b1, b2);
-    if (!IS_UNDIRECTED_EDGE(b1, b2)) error("Edge must exist\n");
-  }
   fprintf(stderr, "XXX u_b2np4c exit\n");  
 }
 
