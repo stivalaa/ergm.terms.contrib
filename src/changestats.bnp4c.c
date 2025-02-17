@@ -394,7 +394,7 @@ C_CHANGESTAT_FN(c_b2np4c) {
   Vertex b1, b2;
   int is_delete;
 
-  fprintf(stderr, "XXX c_b2np4c entered b2 = %d\n", head);
+  fprintf(stderr, "XXX c_b2np4c entered b2 = %d edgestate = %d\n", head, edgestate);
 
   GET_STORAGE(bnp4c_storage_t, sto2); /* Obtain a pointer to private storage
                                        and cast it to the correct type. */
@@ -410,6 +410,7 @@ C_CHANGESTAT_FN(c_b2np4c) {
    * also add it back afterwards to fit in with the standard logic.
    */
   if (is_delete) {
+    fprintf(stderr, " c_b2np4c is_delete TOGGLE\n");
     TOGGLE(b1, b2);
   }
   if (IS_UNDIRECTED_EDGE(b1, b2)) error("Edge must not exist\n");
@@ -423,6 +424,7 @@ C_CHANGESTAT_FN(c_b2np4c) {
   /* change statistic for four-cycles */
   delta = change_fourcycles(nwp, b1, b2);
   sto2->delta_value[b2-1] = delta;
+  fprintf(stderr, "c_b2np4c [1] %d delta_value set to %lu\n", b2, sto2->delta_value[b2-1]);
   change = pow(count + delta, alpha) - pow(count, alpha);
 
   /* add contribution from sum over neighbours of b1 */
@@ -431,6 +433,7 @@ C_CHANGESTAT_FN(c_b2np4c) {
     if (num_fourcycles_node(nwp, vnode, sto2) != vcount) error("b2np4c incorrect fourcycle count [2] for %d correct %lu got %lu\n", vnode, num_fourcycles_node(nwp, vnode, sto2), vcount);
     delta = twopaths(nwp, vnode, b2);
     sto2->delta_value[vnode-1] = delta;
+    fprintf(stderr, "c_b2np4c [2] %d delta_value set to %lu\n", vnode, sto2->delta_value[vnode-1]);    
     change += pow(vcount + delta, alpha) - pow(vcount, alpha);
   })
   CHANGE_STAT[0] += is_delete ? -change : change;
@@ -439,7 +442,6 @@ C_CHANGESTAT_FN(c_b2np4c) {
     TOGGLE(b1, b2);
     if (!IS_UNDIRECTED_EDGE(b1, b2)) error("Edge must exist\n");
   }
-  fprintf(stderr, "c_b2np4c %d delta_value set to %lu\n", b2, sto2->delta_value[b2-1]);
   fprintf(stderr, "XXX c_b2np4c exit\n");
 }
 
