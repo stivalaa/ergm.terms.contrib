@@ -479,12 +479,14 @@ C_CHANGESTAT_FN(c_b2np4c) {
 */
 
 F_CHANGESTAT_FN(f_b1np4c) {
+  fprintf(stderr, "XXX Finalize b1np4c\n");
   GET_STORAGE(bnp4c_storage_t, sto1);
   R_Free(sto1->visited);
   R_Free(sto1->fourcycle_count);
 }
 
 F_CHANGESTAT_FN(f_b2np4c) {
+  fprintf(stderr, "XXX Finalize b2np4c\n");
   GET_STORAGE(bnp4c_storage_t, sto2);
   R_Free(sto2->visited);
   R_Free(sto2->fourcycle_count);
