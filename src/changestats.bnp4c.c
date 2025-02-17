@@ -37,8 +37,6 @@
  *
  *****************************************************************************/
 
-#include <assert.h>
-
 #include "ergm_changestat.h"
 #include "ergm_storage.h"
 
@@ -63,6 +61,8 @@ typedef struct bnp4c_storage_s {
   unsigned long  *fourcycle_count; /* number of four-cycles at each node */
   unsigned long  *delta_value;     /* communicate delta from c_ function to
                                       u_ function */
+  Rboolean        do_update;       /* if TRUE, u_ function does NOT update
+                                      counts */
 } bnp4c_storage_t;
 
 
@@ -210,7 +210,7 @@ static unsigned long change_fourcycles(Network *nwp, Vertex i, Vertex j) {
 
 /*****************************************************************************
  *
- * change statistics functions
+ * Exported: Initializer, updater, change statistics, and finalizer functions
  *
  *****************************************************************************/
 
@@ -227,6 +227,15 @@ static unsigned long change_fourcycles(Network *nwp, Vertex i, Vertex j) {
  */
 
 
+/*
+ * The change statitsics functions (c_) use private storage to communicate
+ * with the update functions (u_). The c_ functions use the four-cycles
+ * counts in fourcycle_count, which are updated by the u_ functions
+ * based on the delta_value set by the c_ functions, so that
+ * there is no need to recompute the delta values in the u_ functions
+ * or the counts themseles in the c_ functions.
+ */
+
 
 /* Initializer: allocate private storage and store number of four-cycles
    at each node . */
@@ -239,6 +248,7 @@ I_CHANGESTAT_FN(i_b1np4c) {
     sto1->fourcycle_count[i-1] = num_fourcycles_node(nwp, i, sto1);
      fprintf(stderr, "i_b1np4c %d set to %lu\n", i, sto1->fourcycle_count[i-1]);
   }
+  sto1->do_update = TRUE;
 }
 
 I_CHANGESTAT_FN(i_b2np4c) {
@@ -250,6 +260,7 @@ I_CHANGESTAT_FN(i_b2np4c) {
     sto2->fourcycle_count[i-1] = num_fourcycles_node(nwp, i, sto2);
      fprintf(stderr, "i_b2np4c %d set to %lu\n", i, sto2->fourcycle_count[i-1]);
   }
+  sto2->do_update = TRUE;
 }
 
 /* Updater: will be called when toggling (tail, head) with state
@@ -321,9 +332,13 @@ U_CHANGESTAT_FN(u_b2np4c) {
   fprintf(stderr, "XXX u_b2np4c entered b2 = %d\n", head);
   GET_STORAGE(bnp4c_storage_t, sto2); /* Obtain a pointer to private storage
                                          and cast it to the correct type. */
+  if (!sto2->do_update) {
+    fprintf(stderr, "XXX u_b2np4c exit with no update\n");
+    return;
+  }
   for (int i = 0; i < N_NODES; i++) {
     sto2->fourcycle_count[i] += is_delete ? -sto2->delta_value[i] : sto2->delta_value[i];
-    fprintf(stderr, "u_b2np4c %d set to %lu\n", i+1, sto2->delta_value[i]);
+    fprintf(stderr, "u_b2np4c %d add added %ld to get to %lu\n", i+1, is_delete ? -sto2->delta_value[i] : sto2->delta_value[i], sto2->fourcycle_count[i]);
   }
   fprintf(stderr, "XXX u_b2np4c exit\n");  
 }
@@ -386,6 +401,7 @@ C_CHANGESTAT_FN(c_b1np4c) {
 
 /*
  * Change statistic function for b2np4c
+ *
  */
 
 C_CHANGESTAT_FN(c_b2np4c) {
@@ -403,6 +419,11 @@ C_CHANGESTAT_FN(c_b2np4c) {
   b1 = tail;
   b2 = head;
   is_delete = IS_UNDIRECTED_EDGE(b1, b2);
+
+  /* Reset delta values to all zero. Important to do this before
+     possible call to TOGGLE below since that will call u_b2np4c() */
+  memset(sto2->delta_value, 0, sizeof(sto2->delta_value[0])*N_NODES);
+
   /* NOTE: For a delete move, we actually toggle the edge ourselves here so
    * that the proposed edge is always NOT present for all the calculations
    * as they involve counting two-paths and four-cycles, on the assumption
@@ -411,11 +432,11 @@ C_CHANGESTAT_FN(c_b2np4c) {
    */
   if (is_delete) {
     fprintf(stderr, " c_b2np4c is_delete TOGGLE\n");
+    sto2->do_update = FALSE;
     TOGGLE(b1, b2);
+    sto2->do_update = TRUE;
   }
   if (IS_UNDIRECTED_EDGE(b1, b2)) error("Edge must not exist\n");
-
-  memset(sto2->delta_value, 0, sizeof(sto2->delta_value[0])*N_NODES);
 
   /* Number of four-cycles the node is already involved in */
   count = sto2->fourcycle_count[b2-1];
@@ -439,8 +460,10 @@ C_CHANGESTAT_FN(c_b2np4c) {
   CHANGE_STAT[0] += is_delete ? -change : change;
   /* For a delete move, we deleted the edge at the start, now add it again */
   if (is_delete) {
+    sto2->do_update = FALSE;
     TOGGLE(b1, b2);
     if (!IS_UNDIRECTED_EDGE(b1, b2)) error("Edge must exist\n");
+    sto2->do_update = TRUE;
   }
   fprintf(stderr, "XXX c_b2np4c exit\n");
 }
