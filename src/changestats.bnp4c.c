@@ -234,7 +234,7 @@ I_CHANGESTAT_FN(i_b1np4c) {
   sto1->fourcycle_count = R_Calloc(N_NODES, unsigned long);
   for (int i = 0; i < N_NODES; i++) {
     sto1->fourcycle_count[i] = num_fourcycles_node(nwp, i, sto1);
-    fprintf(stderr, "i_b1np4c %d set to %lu\n", i+1, sto1->fourcycle_count[i]);//XXX
+    //DEBUG fprintf(stderr, "i_b1np4c %d set to %lu\n", i+1, sto1->fourcycle_count[i]);
   }
 }
 
@@ -244,7 +244,7 @@ I_CHANGESTAT_FN(i_b2np4c) {
   sto2->fourcycle_count = R_Calloc(N_NODES, unsigned long);
   for (int i = 0; i < N_NODES; i++) {
     sto2->fourcycle_count[i] = num_fourcycles_node(nwp, i, sto2);
-    fprintf(stderr, "i_b2np4c %d set to %lu\n", i+1, sto2->fourcycle_count[i]);//XXX    
+    //DEBUG fprintf(stderr, "i_b2np4c %d set to %lu\n", i+1, sto2->fourcycle_count[i]);
   }
 }
 
@@ -262,11 +262,11 @@ I_CHANGESTAT_FN(i_b2np4c) {
 */
 U_CHANGESTAT_FN(u_b1np4c) {
   long delta;
-  unsigned long vcount;
+  //DEBUG unsigned long vcount;
   Vertex b1, b2;
   int is_delete;
 
-  fprintf(stderr, "XXX u_b1np4c entered\n");//XXX
+  //DEBUG fprintf(stderr, "XXX u_b1np4c entered\n");
 
   GET_STORAGE(bnp4c_storage_t, sto1); /* Obtain a pointer to private storage
                                          and cast it to the correct type. */
@@ -289,14 +289,14 @@ U_CHANGESTAT_FN(u_b1np4c) {
   delta = change_fourcycles(nwp, b1, b2);
 
   sto1->fourcycle_count[b1-1] += is_delete ? -delta : delta;
-  fprintf(stderr, "u_b1np4c for %d added %ld to get %lu\n", b1, delta,sto1->fourcycle_count[b1-1]);//XXX
+  //DEBUG fprintf(stderr, "u_b1np4c for %d added %ld to get %lu\n", b1, delta,sto1->fourcycle_count[b1-1]);
   /* add also have to update neighbours of b2 */
   EXEC_THROUGH_EDGES(b2, edge, vnode,  { /* step through edges of b2 */
-    vcount = sto1->fourcycle_count[vnode-1];
-    if (num_fourcycles_node(nwp, vnode, sto1) != vcount) error("u_b1np4c incorrect fourcycle count for %d correct %lu got %lu\n", vnode, num_fourcycles_node(nwp, vnode, sto1), vcount);//XXX
+    //DEBUG vcount = sto1->fourcycle_count[vnode-1];
+    //DEBUG if (num_fourcycles_node(nwp, vnode, sto1) != vcount) error("u_b1np4c incorrect fourcycle count for %d correct %lu got %lu\n", vnode, num_fourcycles_node(nwp, vnode, sto1), vcount);
     delta = twopaths(nwp, vnode, b1);
     sto1->fourcycle_count[vnode-1] += is_delete ? -delta : delta;
-    fprintf(stderr, "u_b1np4c for %d added %ld to get %lu\n",vnode, delta,sto1->fourcycle_count[vnode-1]);//XXX    
+    //DEBUG fprintf(stderr, "u_b1np4c for %d added %ld to get %lu\n",vnode, delta,sto1->fourcycle_count[vnode-1]);
   });
   
 
@@ -309,11 +309,11 @@ U_CHANGESTAT_FN(u_b1np4c) {
 
 U_CHANGESTAT_FN(u_b2np4c) {
   long delta;
-  unsigned long vcount;
+  //DEBUG unsigned long vcount;
   Vertex b1, b2;
   int is_delete;
 
-  fprintf(stderr, "XXX u_b2np4c entered\n");//XXX
+  //DEBUG fprintf(stderr, "XXX u_b2np4c entered\n");
 
   GET_STORAGE(bnp4c_storage_t, sto2); /* Obtain a pointer to private storage
                                          and cast it to the correct type. */
@@ -336,14 +336,14 @@ U_CHANGESTAT_FN(u_b2np4c) {
   delta = change_fourcycles(nwp, b1, b2);
 
   sto2->fourcycle_count[b2-1] += is_delete ? -delta : delta;
-  fprintf(stderr, "u_b2np4c for %d added %ld to get %lu\n", b2, delta,sto2->fourcycle_count[b2-1]);//XXX
+  //DEBUG fprintf(stderr, "u_b2np4c for %d added %ld to get %lu\n", b2, delta,sto2->fourcycle_count[b2-1]);
   /* add also have to update neighbours of b1 */
   EXEC_THROUGH_EDGES(b1, edge, vnode,  { /* step through edges of b1 */
-    vcount = sto2->fourcycle_count[vnode-1];
-    if (num_fourcycles_node(nwp, vnode, sto2) != vcount) error("u_b2np4c incorrect fourcycle count for %d correct %lu got %lu\n", vnode, num_fourcycles_node(nwp, vnode, sto2), vcount);//XXX
+    //DEBUG vcount = sto2->fourcycle_count[vnode-1];
+    //DEBUG if (num_fourcycles_node(nwp, vnode, sto2) != vcount) error("u_b2np4c incorrect fourcycle count for %d correct %lu got %lu\n", vnode, num_fourcycles_node(nwp, vnode, sto2), vcount);
     delta = twopaths(nwp, vnode, b2);
     sto2->fourcycle_count[vnode-1] += is_delete ? -delta : delta;
-    fprintf(stderr, "u_b2np4c for %d added %ld to get %lu\n",vnode, delta,sto2->fourcycle_count[vnode-1]);//XXX    
+    //DEBUG fprintf(stderr, "u_b2np4c for %d added %ld to get %lu\n",vnode, delta,sto2->fourcycle_count[vnode-1]);
   });
   
 
@@ -364,7 +364,7 @@ C_CHANGESTAT_FN(c_b1np4c) {
   Vertex b1, b2;
   int is_delete;
 
-  fprintf(stderr, "XXX c_b1np4c entered\n");
+  //DEBUG fprintf(stderr, "XXX c_b1np4c entered\n");
   
   GET_STORAGE(bnp4c_storage_t, sto1); /* Obtain a pointer to private storage
                                        and cast it to the correct type. */
@@ -386,7 +386,7 @@ C_CHANGESTAT_FN(c_b1np4c) {
 
   /* Number of four-cycles the node is already involved in */
   count = sto1->fourcycle_count[b1-1];
-  if (num_fourcycles_node(nwp, b1, sto1) != count) error("b1np4c incorrect fourcycle count [1] for %d correct %lu got %lu\n", b1, num_fourcycles_node(nwp, b1, sto1), count);//XXX
+  //DEBUG if (num_fourcycles_node(nwp, b1, sto1) != count) error("b1np4c incorrect fourcycle count [1] for %d correct %lu got %lu\n", b1, num_fourcycles_node(nwp, b1, sto1), count);
 
   /* change statistic for four-cycles */
   delta = change_fourcycles(nwp, b1, b2);
@@ -395,7 +395,7 @@ C_CHANGESTAT_FN(c_b1np4c) {
   /* add contribution from sum over neighbours of b2 */
   EXEC_THROUGH_EDGES(b2, edge, vnode,  { /* step through edges of b2 */
     vcount = sto1->fourcycle_count[vnode-1];
-    if (num_fourcycles_node(nwp, vnode, sto1) != vcount) error("b1np4c incorrect fourcycle count [2] for %d correct %lu got %lu\n", vnode, num_fourcycles_node(nwp, vnode, sto1), vcount);//XXX
+    //DEBUG if (num_fourcycles_node(nwp, vnode, sto1) != vcount) error("b1np4c incorrect fourcycle count [2] for %d correct %lu got %lu\n", vnode, num_fourcycles_node(nwp, vnode, sto1), vcount);
     delta = twopaths(nwp, vnode, b1);
     change += pow(vcount + delta, alpha) - pow(vcount, alpha);
   });
@@ -439,7 +439,7 @@ C_CHANGESTAT_FN(c_b2np4c) {
 
   /* Number of four-cycles the node is already involved in */
   count = sto2->fourcycle_count[b2-1];
-  if (num_fourcycles_node(nwp, b2, sto2) != count) error("b2np4c incorrect fourcycle count [1] for %d correct %lu got %lu\n", b2, num_fourcycles_node(nwp, b2, sto2), count);//XXX
+  //DEBUG if (num_fourcycles_node(nwp, b2, sto2) != count) error("b2np4c incorrect fourcycle count [1] for %d correct %lu got %lu\n", b2, num_fourcycles_node(nwp, b2, sto2), count);
 
   /* change statistic for four-cycles */
   delta = change_fourcycles(nwp, b1, b2);
@@ -448,7 +448,7 @@ C_CHANGESTAT_FN(c_b2np4c) {
   /* add contribution from sum over neighbours of b1 */
   EXEC_THROUGH_EDGES(b1, edge, vnode, { /* step through edges of b1 */
     vcount = sto2->fourcycle_count[vnode-1];
-    if (num_fourcycles_node(nwp, vnode, sto2) != vcount) error("b2np4c incorrect fourcycle count [2] for %d correct %lu got %lu\n", vnode, num_fourcycles_node(nwp, vnode, sto2), vcount);//XXX    
+    //DEBUG if (num_fourcycles_node(nwp, vnode, sto2) != vcount) error("b2np4c incorrect fourcycle count [2] for %d correct %lu got %lu\n", vnode, num_fourcycles_node(nwp, vnode, sto2), vcount);
     delta = twopaths(nwp, vnode, b2);
     change += pow(vcount + delta, alpha) - pow(vcount, alpha);
   })
