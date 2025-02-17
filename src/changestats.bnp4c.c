@@ -48,7 +48,6 @@
  *
  *****************************************************************************/
 
-const long NOT_SET = -1; /* value for fourcycle_count not set */
 
  /* private storage struct for b1np4c and b2np4c */
 /* These are just allocated as arrays of length N_NODES for simplicity;
@@ -61,11 +60,7 @@ const long NOT_SET = -1; /* value for fourcycle_count not set */
 typedef struct bnp4c_storage_s {
   int            *visited;         /* visited flag for each node
                                       (working storage) */
-  long           *fourcycle_count; /* number of four-cycles at each node
-                                    (memoization cache) or NOT_SET.
-                                    This is signed (not unsigned) as 
-                                    NOT_SET is -1 */
-
+  unsigned long  *fourcycle_count; /* number of four-cycles at each node */
 } bnp4c_storage_t;
 
 
@@ -138,19 +133,14 @@ static unsigned int twopaths(Network *nwp, Vertex i, Vertex j)  {
  * The bnp4c_storage_t sto parameter containing the visited working
  * storage is allocated by the caller.
  *
- * The return value is signed (not unsigned) to avoid problems with
- * signed/unsigned in the memoization which is signed in order to use
- * NOT_SET = -1 since any non-negative integer could be a valid count.
- * The return value from this function is always non-negative, however.
  */
-
-static long num_fourcycles_node(Network *nwp, Vertex unode,
-				bnp4c_storage_t *sto)  {
+static unsigned long num_fourcycles_node(Network *nwp, Vertex unode,
+                                         bnp4c_storage_t *sto)  {
   /* Note Network *nwp parameter has to be called nwp for use of macros */
 
   Vertex vnode, wnode;
   Edge edge1, edge2;
-  long fourcycle_count = 0;
+  unsigned long fourcycle_count = 0;
   int *visited = sto->visited;
   
   memset(visited, 0, N_NODES*sizeof(visited[0]));
@@ -195,11 +185,11 @@ static long num_fourcycles_node(Network *nwp, Vertex unode,
  * Change statistic for number of four-cycles in undirected network
  * when edge i -- j is added
  */
-static long change_fourcycles(Network *nwp, Vertex i, Vertex j) {
+static unsigned long change_fourcycles(Network *nwp, Vertex i, Vertex j) {
   /* Note Network *nwp parameter has to be called nwp for use of macros */
   Vertex vnode;
   Edge edge;
-  long delta = 0;
+  unsigned long delta = 0;
 
   /* In an undirected network, each edge is only stored as (tail, head) where
      tail < head, so to step through all edges of a node it is necessary
@@ -236,24 +226,24 @@ static long change_fourcycles(Network *nwp, Vertex i, Vertex j) {
 
 
 
-/* Initializer: allocate private storage. */
+/* Initializer: allocate private storage and store number of four-cycles
+   at each node . */
 I_CHANGESTAT_FN(i_b1np4c) {
   ALLOC_STORAGE(1, bnp4c_storage_t, sto1);
   sto1->visited = R_Calloc(N_NODES, int);
-  sto1->fourcycle_count = R_Calloc(N_NODES, long);
-  /* initialize nodewise fourcycle count cache to NOT_SET */
+  sto1->fourcycle_count = R_Calloc(N_NODES, unsigned long);
   for (int i = 0; i < N_NODES; i++) {
-    sto1->fourcycle_count[i] = NOT_SET;
+    sto1->fourcycle_count[i] = num_fourcycles_node(nwp, i, sto1);
+    fprintf(stderr, "i_b2np4c %d set to %lu\n", i+1, sto1->fourcycle_count[i]);//XXX
   }
 }
 
 I_CHANGESTAT_FN(i_b2np4c) {
   ALLOC_STORAGE(1, bnp4c_storage_t, sto2);
   sto2->visited = R_Calloc(N_NODES, int);
-  sto2->fourcycle_count = R_Calloc(N_NODES, long);
-  /* initialize nodewise fourcycle count cache to NOT_SET */
+  sto2->fourcycle_count = R_Calloc(N_NODES, unsigned long);
   for (int i = 0; i < N_NODES; i++) {
-    sto2->fourcycle_count[i] = NOT_SET;
+    sto2->fourcycle_count[i] = num_fourcycles_node(nwp, i, sto2);
   }
 }
 
@@ -271,7 +261,6 @@ U_CHANGESTAT_FN(u_b1np4c) {
   int is_delete;
 
   fprintf(stderr, "XXX u_b1np4c entered\n");//XXX
-  error('XXX');
 
   GET_STORAGE(bnp4c_storage_t, sto1); /* Obtain a pointer to private storage
                                          and cast it to the correct type. */
@@ -290,15 +279,11 @@ U_CHANGESTAT_FN(u_b1np4c) {
   }
   if (IS_UNDIRECTED_EDGE(b1, b2)) error("Edge must not exist\n");
 
-  if (sto1->fourcycle_count[b1-1] == NOT_SET) {
-    fprintf(stderr, "XXX u_b1np4c setting %d\n",b1);//XXX
-    sto1->fourcycle_count[b1-1] = num_fourcycles_node(nwp, b1, sto1);
-  }
-
   /* change statistic for four-cycles */
   delta = change_fourcycles(nwp, b1, b2);
 
   sto1->fourcycle_count[b1-1] += is_delete ? -delta : delta;
+  fprintf(stderr, "u_b1np4c for %d added %ld to get %lu\n", b1, delta,sto1->fourcycle_count[b1-1]);//XXX
 
   /* For a delete move, we deleted the edge at the start, now add it again */
   if (is_delete) {
@@ -313,10 +298,12 @@ U_CHANGESTAT_FN(u_b1np4c) {
  */
 C_CHANGESTAT_FN(c_b1np4c) {
   double change, alpha, delta;
-  long count, vcount;
+  unsigned long count, vcount;
   Vertex b1, b2;
   int is_delete;
 
+  fprintf(stderr, "XXX c_b1np4c entered\n");
+  
   GET_STORAGE(bnp4c_storage_t, sto1); /* Obtain a pointer to private storage
                                        and cast it to the correct type. */
 
@@ -338,7 +325,7 @@ C_CHANGESTAT_FN(c_b1np4c) {
 
   /* Number of four-cycles the node is already involved in */
   count = sto1->fourcycle_count[b1-1];
-  if (count == NOT_SET) error("b1np4c fourcycle count is not set [1]\n");
+  if (num_fourcycles_node(nwp, b1, sto1) != count) error("b1np4c incorrect fourcycle count [1] for %d correct %lu got %lu\n", b1, num_fourcycles_node(nwp, b1, sto1), count);//XXX
 
   /* change statistic for four-cycles */
   delta = change_fourcycles(nwp, b1, b2);
@@ -347,7 +334,7 @@ C_CHANGESTAT_FN(c_b1np4c) {
   /* add contribution from sum over neighbours of b2 */
   EXEC_THROUGH_EDGES(b2, edge, vnode,  { /* step through edges of b2 */
     vcount = sto1->fourcycle_count[vnode-1];
-    if (vcount == NOT_SET) error("b1np4c fourcycle count is not set [2]\n");
+    if (num_fourcycles_node(nwp, vnode, sto1) != vcount) error("b1np4c incorrect fourcycle count [2] for %d correct %lu got %lu\n", vnode, num_fourcycles_node(nwp, vnode, sto1), vcount);//XXX
     delta = twopaths(nwp, vnode, b1);
     change += pow(vcount + delta, alpha) - pow(vcount, alpha);
   });
@@ -367,7 +354,7 @@ C_CHANGESTAT_FN(c_b1np4c) {
 
 C_CHANGESTAT_FN(c_b2np4c) {
   double change, alpha, delta;
-  long count, vcount;
+  unsigned long count, vcount;
   Vertex b1, b2;
   int is_delete;
 
@@ -375,7 +362,7 @@ C_CHANGESTAT_FN(c_b2np4c) {
                                        and cast it to the correct type. */
   /* initialize nodewise fourcycle count cache to NOT_SET */
   for (int i = 0; i < N_NODES; i++) {
-    sto2->fourcycle_count[i] = NOT_SET;
+    sto2->fourcycle_count[i] = -1;//XXXNOT_SET;
   }
 
   alpha = INPUT_PARAM[0];
