@@ -322,8 +322,7 @@ U_CHANGESTAT_FN(u_b2np4c) {
   GET_STORAGE(bnp4c_storage_t, sto2); /* Obtain a pointer to private storage
                                          and cast it to the correct type. */
   for (int i = 0; i < N_NODES; i++) {
-    sto2->fourcycle_count[i] = sto2->delta_value[i];
-    if (is_delete) sto2->fourcycle_count[i] *= -1;
+    sto2->fourcycle_count[i] += is_delete ? -sto2->delta_value[i] : sto2->delta_value[i];
     fprintf(stderr, "u_b2np4c %d set to %lu\n", i+1, sto2->delta_value[i]);
   }
   fprintf(stderr, "XXX u_b2np4c exit\n");  
@@ -429,7 +428,7 @@ C_CHANGESTAT_FN(c_b2np4c) {
   /* add contribution from sum over neighbours of b1 */
   EXEC_THROUGH_EDGES(b1, edge, vnode, { /* step through edges of b1 */
     vcount = sto2->fourcycle_count[vnode-1];
-     if (num_fourcycles_node(nwp, vnode, sto2) != vcount) error("b2np4c incorrect fourcycle count [2] for %d correct %lu got %lu\n", vnode, num_fourcycles_node(nwp, vnode, sto2), vcount);
+    if (num_fourcycles_node(nwp, vnode, sto2) != vcount) error("b2np4c incorrect fourcycle count [2] for %d correct %lu got %lu\n", vnode, num_fourcycles_node(nwp, vnode, sto2), vcount);
     delta = twopaths(nwp, vnode, b2);
     sto2->delta_value[vnode-1] = delta;
     change += pow(vcount + delta, alpha) - pow(vcount, alpha);
@@ -461,6 +460,7 @@ F_CHANGESTAT_FN(f_b1np4c) {
   GET_STORAGE(bnp4c_storage_t, sto1);
   R_Free(sto1->visited);
   R_Free(sto1->fourcycle_count);
+  R_Free(sto1->delta_value);
 }
 
 F_CHANGESTAT_FN(f_b2np4c) {
@@ -468,4 +468,5 @@ F_CHANGESTAT_FN(f_b2np4c) {
   GET_STORAGE(bnp4c_storage_t, sto2);
   R_Free(sto2->visited);
   R_Free(sto2->fourcycle_count);
+  R_Free(sto2->delta_value);
 }
