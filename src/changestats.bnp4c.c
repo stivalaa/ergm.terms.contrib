@@ -255,6 +255,10 @@ I_CHANGESTAT_FN(i_b2np4c) {
  * statistics function.
  *
  */
+/* Note the u_ function is called AFTER the c_ function (and only
+   if the move is accepted), see API definition
+   https://cran.r-project.org/web/packages/ergm/vignettes/Terms-API.html
+*/
 U_CHANGESTAT_FN(u_b1np4c) {
   long delta;
   Vertex b1, b2;
@@ -266,7 +270,7 @@ U_CHANGESTAT_FN(u_b1np4c) {
                                          and cast it to the correct type. */
   b1 = tail;
   b2 = head;
-  is_delete = IS_UNDIRECTED_EDGE(b1, b2);
+  is_delete = edgestate;
 
   /* NOTE: For a delete move, we actually toggle the edge ourselves here so
    * that the proposed edge is always NOT present for all the calculations
