@@ -61,6 +61,8 @@ typedef struct bnp4c_storage_s {
   int            *visited;         /* visited flag for each node
                                       (working storage) */
   unsigned long  *fourcycle_count; /* number of four-cycles at each node */
+  unsigned long  *delta_value;     /* communicate delta from c_ function to
+                                      u_ function */
 } bnp4c_storage_t;
 
 
@@ -232,6 +234,7 @@ I_CHANGESTAT_FN(i_b1np4c) {
   ALLOC_STORAGE(1, bnp4c_storage_t, sto1);
   sto1->visited = R_Calloc(N_NODES, int);
   sto1->fourcycle_count = R_Calloc(N_NODES, unsigned long);
+  sto1->delta_value = R_Calloc(N_NODES, unsigned long);
   for (int i = 1; i <= N_NODES; i++) {
     sto1->fourcycle_count[i-1] = num_fourcycles_node(nwp, i, sto1);
      fprintf(stderr, "i_b1np4c %d set to %lu\n", i, sto1->fourcycle_count[i-1]);
@@ -242,6 +245,7 @@ I_CHANGESTAT_FN(i_b2np4c) {
   ALLOC_STORAGE(1, bnp4c_storage_t, sto2);
   sto2->visited = R_Calloc(N_NODES, int);
   sto2->fourcycle_count = R_Calloc(N_NODES, unsigned long);
+  sto2->delta_value = R_Calloc(N_NODES, unsigned long);
   for (int i = 1; i <= N_NODES; i++) {
     sto2->fourcycle_count[i-1] = num_fourcycles_node(nwp, i, sto2);
      fprintf(stderr, "i_b2np4c %d set to %lu\n", i, sto2->fourcycle_count[i-1]);
@@ -310,34 +314,18 @@ U_CHANGESTAT_FN(u_b1np4c) {
 
 U_CHANGESTAT_FN(u_b2np4c) {
   long delta;
-   unsigned long vcount;
-  Vertex b1, b2;
-  int is_delete;
+  unsigned long vcount;
+  Vertex b2;
+  int is_delete = edgestate;
 
   fprintf(stderr, "XXX u_b2np4c entered b2 = %d\n", head);
-
   GET_STORAGE(bnp4c_storage_t, sto2); /* Obtain a pointer to private storage
                                          and cast it to the correct type. */
-  b1 = tail;
-  b2 = head;
-  is_delete = edgestate;
-
-  if (IS_UNDIRECTED_EDGE(b1, b2)) error("Edge must not exist\n");
-
-  /* change statistic for four-cycles */
-  delta = change_fourcycles(nwp, b1, b2);
-
-  sto2->fourcycle_count[b2-1] += is_delete ? -delta : delta;
-   fprintf(stderr, "u_b2np4c for %d added %ld to get %lu\n", b2, delta,sto2->fourcycle_count[b2-1]);
-  /* add also have to update neighbours of b1 */
-  EXEC_THROUGH_EDGES(b1, edge, vnode,  { /* step through edges of b1 */
-     vcount = sto2->fourcycle_count[vnode-1];
-     if (num_fourcycles_node(nwp, vnode, sto2) != vcount) error("u_b2np4c incorrect fourcycle count for %d correct %lu got %lu\n", vnode, num_fourcycles_node(nwp, vnode, sto2), vcount);
-    delta = twopaths(nwp, vnode, b2);
-    sto2->fourcycle_count[vnode-1] += is_delete ? -delta : delta;
-     fprintf(stderr, "u_b2np4c for %d added %ld to get %lu\n",vnode, delta,sto2->fourcycle_count[vnode-1]);
-  });
-  
+  for (int i = 0; i < N_NODES; i++) {
+    sto2->fourcycle_count[i] = sto2->delta_value[i];
+    if (is_delete) sto2->fourcycle_count[i] *= -1;
+    fprintf(stderr, "u_b2np4c %d set to %lu\n", i+1, sto2->delta_value[i]);
+  }
   fprintf(stderr, "XXX u_b2np4c exit\n");  
 }
 
@@ -427,12 +415,15 @@ C_CHANGESTAT_FN(c_b2np4c) {
   }
   if (IS_UNDIRECTED_EDGE(b1, b2)) error("Edge must not exist\n");
 
+  memset(sto2->delta_value, 0, sizeof(sto2->delta_value[0])*N_NODES);
+
   /* Number of four-cycles the node is already involved in */
   count = sto2->fourcycle_count[b2-1];
    if (num_fourcycles_node(nwp, b2, sto2) != count) error("b2np4c incorrect fourcycle count [1] for %d correct %lu got %lu\n", b2, num_fourcycles_node(nwp, b2, sto2), count);
 
   /* change statistic for four-cycles */
   delta = change_fourcycles(nwp, b1, b2);
+  sto2->delta_value[b2-1] = delta;
   change = pow(count + delta, alpha) - pow(count, alpha);
 
   /* add contribution from sum over neighbours of b1 */
@@ -440,6 +431,7 @@ C_CHANGESTAT_FN(c_b2np4c) {
     vcount = sto2->fourcycle_count[vnode-1];
      if (num_fourcycles_node(nwp, vnode, sto2) != vcount) error("b2np4c incorrect fourcycle count [2] for %d correct %lu got %lu\n", vnode, num_fourcycles_node(nwp, vnode, sto2), vcount);
     delta = twopaths(nwp, vnode, b2);
+    sto2->delta_value[vnode-1] = delta;
     change += pow(vcount + delta, alpha) - pow(vcount, alpha);
   })
   CHANGE_STAT[0] += is_delete ? -change : change;
@@ -448,6 +440,7 @@ C_CHANGESTAT_FN(c_b2np4c) {
     TOGGLE(b1, b2);
     if (!IS_UNDIRECTED_EDGE(b1, b2)) error("Edge must exist\n");
   }
+  fprintf(stderr, "c_b2np4c %d delta_value set to %lu\n", b2, sto2->delta_value[b2-1]);
   fprintf(stderr, "XXX c_b2np4c exit\n");
 }
 
