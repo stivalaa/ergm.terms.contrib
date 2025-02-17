@@ -261,6 +261,7 @@ I_CHANGESTAT_FN(i_b2np4c) {
 */
 U_CHANGESTAT_FN(u_b1np4c) {
   long delta;
+  unsigned long vcount;
   Vertex b1, b2;
   int is_delete;
 
@@ -288,6 +289,15 @@ U_CHANGESTAT_FN(u_b1np4c) {
 
   sto1->fourcycle_count[b1-1] += is_delete ? -delta : delta;
   fprintf(stderr, "u_b1np4c for %d added %ld to get %lu\n", b1, delta,sto1->fourcycle_count[b1-1]);//XXX
+  /* add also have to update neighbours of b2 */
+  EXEC_THROUGH_EDGES(b2, edge, vnode,  { /* step through edges of b2 */
+    vcount = sto1->fourcycle_count[vnode-1];
+    if (num_fourcycles_node(nwp, vnode, sto1) != vcount) error("u_b1np4c incorrect fourcycle count for %d correct %lu got %lu\n", vnode, num_fourcycles_node(nwp, vnode, sto1), vcount);//XXX
+    delta = twopaths(nwp, vnode, b1);
+    sto1->fourcycle_count[vnode-1] += is_delete ? -delta : delta;
+    fprintf(stderr, "u_b1np4c for %d added %ld to get %lu\n",vnode, delta,sto1->fourcycle_count[vnode-1]);//XXX    
+  });
+  
 
   /* For a delete move, we deleted the edge at the start, now add it again */
   if (is_delete) {
