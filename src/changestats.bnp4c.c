@@ -132,7 +132,7 @@ static unsigned int twopaths(Network *nwp, Vertex i, Vertex j,
         count++;
     }
     STEP_THROUGH_INEDGES(j, edge2, wnode) {
-      if ((j == ignore1 && wnode == ignore2) || j == (ignore2 && wnode == ignore1))
+      if ((j == ignore1 && wnode == ignore2) || (j == ignore2 && wnode == ignore1))
         continue;
       if (wnode == vnode)      /* v -- j */
         count++;
