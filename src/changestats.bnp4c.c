@@ -40,6 +40,14 @@
 #include "ergm_changestat.h"
 #include "ergm_storage.h"
 
+
+
+#ifdef DEBUG
+#define DEBUG_PRINT(x) printf("DEBUG BNP4C: "); printf x
+#else
+#define DEBUG_PRINT(x) /* nothing */
+#endif
+
 /*****************************************************************************
  *
  * type definitions
@@ -265,7 +273,7 @@ I_CHANGESTAT_FN(i_b1np4c) {
   sto1->fourcycle_count = R_Calloc(N_NODES, unsigned long);
   for (int i = 1; i <= N_NODES; i++) {
     sto1->fourcycle_count[i-1] = num_fourcycles_node(nwp, i, sto1);
-     fprintf(stderr, "i_b1np4c %d set to %lu\n", i, sto1->fourcycle_count[i-1]);
+     DEBUG_PRINT(("i_b1np4c %d set to %lu\n", i, sto1->fourcycle_count[i-1]));
   }
   sto1->do_update = TRUE;
 }
@@ -276,7 +284,7 @@ I_CHANGESTAT_FN(i_b2np4c) {
   sto2->fourcycle_count = R_Calloc(N_NODES, unsigned long);
   for (int i = 1; i <= N_NODES; i++) {
     sto2->fourcycle_count[i-1] = num_fourcycles_node(nwp, i, sto2);
-     fprintf(stderr, "i_b2np4c %d set to %lu\n", i, sto2->fourcycle_count[i-1]);
+     DEBUG_PRINT(("i_b2np4c %d set to %lu\n", i, sto2->fourcycle_count[i-1]));
   }
   sto2->do_update = TRUE;
 }
@@ -298,21 +306,21 @@ U_CHANGESTAT_FN(u_b1np4c) {
   Vertex b1 = tail, b2 = head;
   int is_delete = edgestate;
 
-  fprintf(stderr, "XXX u_b1np4c entered b1 = %d is_delete = %d\n", b1, is_delete);
+  DEBUG_PRINT(("XXX u_b1np4c entered b1 = %d is_delete = %d\n", b1, is_delete));
   GET_STORAGE(bnp4c_storage_t, sto1); /* Obtain a pointer to private storage
                                          and cast it to the correct type. */
   /* change statistic for four-cycles */
   delta = change_fourcycles(nwp, b1, b2, b1, b2);
   sto1->fourcycle_count[b1-1] += is_delete ? -delta : delta;
-  fprintf(stderr, "u_b1np4c for %d added %ld to get %lu\n", b1, delta,sto1->fourcycle_count[b1-1]);
+  DEBUG_PRINT(("u_b1np4c for %d added %ld to get %lu\n", b1, delta,sto1->fourcycle_count[b1-1]));
   /* add also have to update neighbours of b2 */
   EXEC_THROUGH_EDGES(b2, edge, vnode,  { /* step through edges of b2 */
     if (vnode == b1) continue; /* except for b1 -- b2 edge (if is_delete) */   
     delta = twopaths(nwp, vnode, b1, b1, b2);
     sto1->fourcycle_count[vnode-1] += is_delete ? -delta : delta;
-    fprintf(stderr, "u_b1np4c for %d added %ld to get %lu\n",vnode-1, delta,sto1->fourcycle_count[vnode-1]);
+    DEBUG_PRINT(("u_b1np4c for %d added %ld to get %lu\n",vnode-1, delta,sto1->fourcycle_count[vnode-1]));
   });
-  fprintf(stderr, "XXX u_b1np4c exit\n");
+  DEBUG_PRINT(("XXX u_b1np4c exit\n"));
 }
 
 U_CHANGESTAT_FN(u_b2np4c) {
@@ -320,21 +328,21 @@ U_CHANGESTAT_FN(u_b2np4c) {
   int is_delete = edgestate;
   Vertex b1 = tail, b2 = head;
 
-  fprintf(stderr, "XXX u_b2np4c entered b2 = %d is_delete = %d\n", b2, is_delete);
+  DEBUG_PRINT(("XXX u_b2np4c entered b2 = %d is_delete = %d\n", b2, is_delete));
   GET_STORAGE(bnp4c_storage_t, sto2); /* Obtain a pointer to private storage
                                          and cast it to the correct type. */
   /* change statistic for four-cycles */
   delta = change_fourcycles(nwp, b1, b2, b1, b2);
   sto2->fourcycle_count[b2-1] += is_delete ? -delta : delta;
-  fprintf(stderr, "u_b2np4c [1] %d added %ld to get %lu\n", b2-1, is_delete ? -delta : delta, sto2->fourcycle_count[b2-1]);
+  DEBUG_PRINT(("u_b2np4c [1] %d added %ld to get %lu\n", b2-1, is_delete ? -delta : delta, sto2->fourcycle_count[b2-1]));
   /* also changes four-cycle counts for neighbours of b1 */
   EXEC_THROUGH_EDGES(b1, edge, vnode, { /* step through edges of b1 */
     if (vnode == b2) continue; /* except for b1 -- b2 edge (if is_delete) */
     delta = twopaths(nwp, vnode, b2, b1, b2);
     sto2->fourcycle_count[vnode-1] += is_delete ? - delta : delta;
-    fprintf(stderr, "u_b2np4c [2] %d added %ld to get %lu\n", vnode-1, is_delete ? -delta : delta, sto2->fourcycle_count[vnode-1]);    
+    DEBUG_PRINT(("u_b2np4c [2] %d added %ld to get %lu\n", vnode-1, is_delete ? -delta : delta, sto2->fourcycle_count[vnode-1]));    
   })
-  fprintf(stderr, "XXX u_b2np4c exit\n");  
+  DEBUG_PRINT(("XXX u_b2np4c exit\n"));  
 }
 
 
@@ -347,7 +355,7 @@ C_CHANGESTAT_FN(c_b1np4c) {
   Vertex b1, b2;
   int is_delete;
 
-  fprintf(stderr, "XXX c_b1np4c entered b1 = %d\n", tail);
+  DEBUG_PRINT(("XXX c_b1np4c entered b1 = %d\n", tail));
   
   GET_STORAGE(bnp4c_storage_t, sto1); /* Obtain a pointer to private storage
                                        and cast it to the correct type. */
@@ -369,8 +377,9 @@ C_CHANGESTAT_FN(c_b1np4c) {
 
   /* Number of four-cycles the node is already involved in */
   count = sto1->fourcycle_count[b1-1];
+#ifdef DEBUG
   if (num_fourcycles_node(nwp, b1, sto1) != count) error("b1np4c incorrect fourcycle count [1] for %d correct %lu got %lu\n", b1, num_fourcycles_node(nwp, b1, sto1), count);
-
+#endif /* DEBUG */
   /* change statistic for four-cycles */
   delta = change_fourcycles(nwp, b1, b2, 0, 0);
   change = pow(count + delta, alpha) - pow(count, alpha);
@@ -378,7 +387,9 @@ C_CHANGESTAT_FN(c_b1np4c) {
   /* add contribution from sum over neighbours of b2 */
   EXEC_THROUGH_EDGES(b2, edge, vnode,  { /* step through edges of b2 */
     vcount = sto1->fourcycle_count[vnode-1];
-     if (num_fourcycles_node(nwp, vnode, sto1) != vcount) error("b1np4c incorrect fourcycle count [2] for %d correct %lu got %lu\n", vnode, num_fourcycles_node(nwp, vnode, sto1), vcount);
+#ifdef DEBUG
+    if (num_fourcycles_node(nwp, vnode, sto1) != vcount) error("b1np4c incorrect fourcycle count [2] for %d correct %lu got %lu\n", vnode, num_fourcycles_node(nwp, vnode, sto1), vcount);
+#endif /* DEBUG */
     delta = twopaths(nwp, vnode, b1, 0, 0);
     change += pow(vcount + delta, alpha) - pow(vcount, alpha);
   });
@@ -388,7 +399,7 @@ C_CHANGESTAT_FN(c_b1np4c) {
     TOGGLE(b1, b2);
     if (!IS_UNDIRECTED_EDGE(b1, b2)) error("Edge must exist\n");
   }
-  fprintf(stderr, "XXX c_b1np4c exit\n");
+  DEBUG_PRINT(("XXX c_b1np4c exit\n"));
 }
 
 
@@ -404,7 +415,7 @@ C_CHANGESTAT_FN(c_b2np4c) {
   Vertex b1, b2;
   int is_delete;
 
-  fprintf(stderr, "XXX c_b2np4c entered b2 = %d edgestate = %d\n", head, edgestate);
+  DEBUG_PRINT(("XXX c_b2np4c entered b2 = %d edgestate = %d\n", head, edgestate));
 
   GET_STORAGE(bnp4c_storage_t, sto2); /* Obtain a pointer to private storage
                                        and cast it to the correct type. */
@@ -421,15 +432,16 @@ C_CHANGESTAT_FN(c_b2np4c) {
    * also add it back afterwards to fit in with the standard logic.
    */
   if (is_delete) {
-    fprintf(stderr, " c_b2np4c is_delete TOGGLE\n");
+    DEBUG_PRINT((" c_b2np4c is_delete TOGGLE\n"));
     TOGGLE(b1, b2);
   }
   if (IS_UNDIRECTED_EDGE(b1, b2)) error("Edge must not exist\n");
 
   /* Number of four-cycles the node is already involved in */
   count = sto2->fourcycle_count[b2-1];
+#ifdef DEBUG
   if (num_fourcycles_node(nwp, b2, sto2) != count) error("b2np4c incorrect fourcycle count [1] for %d correct %lu got %lu\n", b2, num_fourcycles_node(nwp, b2, sto2), count);
-
+#endif /* DEBUG */
   /* change statistic for four-cycles */
   delta = change_fourcycles(nwp, b1, b2, 0, 0);
   change = pow(count + delta, alpha) - pow(count, alpha);
@@ -437,7 +449,9 @@ C_CHANGESTAT_FN(c_b2np4c) {
   /* add contribution from sum over neighbours of b1 */
   EXEC_THROUGH_EDGES(b1, edge, vnode, { /* step through edges of b1 */
     vcount = sto2->fourcycle_count[vnode-1];
+#ifdef DEBUG
     if (num_fourcycles_node(nwp, vnode, sto2) != vcount) error("b2np4c incorrect fourcycle count [2] for %d correct %lu got %lu\n", vnode, num_fourcycles_node(nwp, vnode, sto2), vcount);
+#endif /* DEBUG */
     delta = twopaths(nwp, vnode, b2, 0, 0);
     change += pow(vcount + delta, alpha) - pow(vcount, alpha);
   })
@@ -449,7 +463,7 @@ C_CHANGESTAT_FN(c_b2np4c) {
     if (!IS_UNDIRECTED_EDGE(b1, b2)) error("Edge must exist\n");
     sto2->do_update = TRUE;
   }
-  fprintf(stderr, "XXX c_b2np4c exit\n");
+  DEBUG_PRINT(("XXX c_b2np4c exit\n"));
 }
 
 
@@ -465,14 +479,14 @@ C_CHANGESTAT_FN(c_b2np4c) {
 */
 
 F_CHANGESTAT_FN(f_b1np4c) {
-  fprintf(stderr, "XXX Finalize b1np4c\n");
+  DEBUG_PRINT(("XXX Finalize b1np4c\n"));
   GET_STORAGE(bnp4c_storage_t, sto1);
   R_Free(sto1->visited);
   R_Free(sto1->fourcycle_count);
 }
 
 F_CHANGESTAT_FN(f_b2np4c) {
-  fprintf(stderr, "XXX Finalize b2np4c\n");
+  DEBUG_PRINT(("XXX Finalize b2np4c\n"));
   GET_STORAGE(bnp4c_storage_t, sto2);
   R_Free(sto2->visited);
   R_Free(sto2->fourcycle_count);
