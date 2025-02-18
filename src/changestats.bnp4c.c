@@ -60,8 +60,8 @@
  * they could perhaps more appropriately be hash tables, but, unlike the case
  * for dyadic properties and so would require N^2 storage, it is not
  * too inefficient to require N storage here.
- * Note than indexiing in these two arrays is 0..N_NODES-1 so
- * must subrtact one when indexigin from a Vertex which
+ * Note than indexing in these two arrays is 0..N_NODES-1 so
+ * must subtract one when indexing from a Vertex which
  * is 1..N_NODES (R style) */
 typedef struct bnp4c_storage_s {
   int            *visited;         /* visited flag for each node
