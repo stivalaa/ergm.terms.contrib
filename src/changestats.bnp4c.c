@@ -271,7 +271,7 @@ I_CHANGESTAT_FN(i_b1np4c) {
   sto1->fourcycle_count = R_Calloc(N_NODES, unsigned long);
   for (int i = 1; i <= N_NODES; i++) {
     sto1->fourcycle_count[i-1] = num_fourcycles_node(nwp, i, sto1);
-     DEBUG_PRINT(("i_b1np4c %d set to %lu\n", i, sto1->fourcycle_count[i-1]));
+    DEBUG_PRINT(("i_b1np4c %d set to %lu\n", i, sto1->fourcycle_count[i-1]));
   }
 }
 
@@ -281,7 +281,7 @@ I_CHANGESTAT_FN(i_b2np4c) {
   sto2->fourcycle_count = R_Calloc(N_NODES, unsigned long);
   for (int i = 1; i <= N_NODES; i++) {
     sto2->fourcycle_count[i-1] = num_fourcycles_node(nwp, i, sto2);
-     DEBUG_PRINT(("i_b2np4c %d set to %lu\n", i, sto2->fourcycle_count[i-1]));
+    DEBUG_PRINT(("i_b2np4c %d set to %lu\n", i, sto2->fourcycle_count[i-1]));
   }
 }
 
