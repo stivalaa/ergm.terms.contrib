@@ -67,8 +67,6 @@ typedef struct bnp4c_storage_s {
   int            *visited;         /* visited flag for each node
                                       (working storage) */
   unsigned long  *fourcycle_count; /* number of four-cycles at each node */
-  Rboolean        do_update;       /* if TRUE, u_ function does NOT update
-                                      counts */
 } bnp4c_storage_t;
 
 
@@ -275,7 +273,6 @@ I_CHANGESTAT_FN(i_b1np4c) {
     sto1->fourcycle_count[i-1] = num_fourcycles_node(nwp, i, sto1);
      DEBUG_PRINT(("i_b1np4c %d set to %lu\n", i, sto1->fourcycle_count[i-1]));
   }
-  sto1->do_update = TRUE;
 }
 
 I_CHANGESTAT_FN(i_b2np4c) {
@@ -286,7 +283,6 @@ I_CHANGESTAT_FN(i_b2np4c) {
     sto2->fourcycle_count[i-1] = num_fourcycles_node(nwp, i, sto2);
      DEBUG_PRINT(("i_b2np4c %d set to %lu\n", i, sto2->fourcycle_count[i-1]));
   }
-  sto2->do_update = TRUE;
 }
 
 /* Updater: will be called when toggling (tail, head) with state
@@ -460,10 +456,8 @@ C_CHANGESTAT_FN(c_b2np4c) {
   CHANGE_STAT[0] += is_delete ? -change : change;
   /* For a delete move, we deleted the edge at the start, now add it again */
   if (is_delete) {
-    sto2->do_update = FALSE;
     TOGGLE(b1, b2);
     if (!IS_UNDIRECTED_EDGE(b1, b2)) error("Edge must exist\n");
-    sto2->do_update = TRUE;
   }
   DEBUG_PRINT(("XXX c_b2np4c exit\n"));
 }
