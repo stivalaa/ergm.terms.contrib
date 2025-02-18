@@ -41,7 +41,7 @@
 #include "ergm_storage.h"
 
 
-
+#define DEBUG //XXX
 #ifdef DEBUG
 #define DEBUG_PRINT(x) printf("DEBUG BNP4C: "); printf x
 #else
@@ -278,23 +278,25 @@ static unsigned long change_fourcycles(Network *nwp, Vertex i, Vertex j,
    at each node . */
 I_CHANGESTAT_FN(i_b1np4c) {
   ALLOC_STORAGE(1, bnp4c_storage_t, sto1);
+  DEBUG_PRINT(("i_b1np4c N_NODES = %d BIPARTITE = %d\n", N_NODES, BIPARTITE));
   sto1->visited = R_Calloc(N_NODES, int);
   if (BIPARTITE == 0) error("Network must be bipartite\n");
   sto1->fourcycle_count = R_Calloc(BIPARTITE, unsigned long);
   for (int i = 1; i <= BIPARTITE; i++) {
     sto1->fourcycle_count[i-1] = num_fourcycles_node(nwp, i, sto1);
-    DEBUG_PRINT(("i_b1np4c %d set to %lu\n", i, sto1->fourcycle_count[i-1]));
+    DEBUG_PRINT(("i_b1np4c %d (index %d) set to %lu\n", i, i-1, sto1->fourcycle_count[i-1]));
   }
 }
 
 I_CHANGESTAT_FN(i_b2np4c) {
   ALLOC_STORAGE(1, bnp4c_storage_t, sto2);
+  DEBUG_PRINT(("i_b2np4c N_NODES = %d BIPARTITE = %d\n", N_NODES, BIPARTITE));
   sto2->visited = R_Calloc(N_NODES, int);
   if (BIPARTITE == 0) error("Network must be bipartite\n");  
   sto2->fourcycle_count = R_Calloc(N_NODES-BIPARTITE, unsigned long);
   for (int i = BIPARTITE+1; i <= N_NODES; i++) {
     sto2->fourcycle_count[i-BIPARTITE-1] = num_fourcycles_node(nwp, i, sto2);
-    DEBUG_PRINT(("i_b2np4c %d set to %lu\n", i, sto2->fourcycle_count[i-BIPARTITE-1]));
+    DEBUG_PRINT(("i_b2np4c %d (index %d) set to %lu\n", i, i-BIPARTITE-1, sto2->fourcycle_count[i-BIPARTITE-1]));
   }
 }
 
@@ -396,10 +398,10 @@ C_CHANGESTAT_FN(c_b1np4c) {
   /* add contribution from sum over neighbours of b2 */
   EXEC_THROUGH_EDGES(b2, edge, vnode,  { /* step through edges of b2 */
     vcount = sto1->fourcycle_count[vnode-1];
-/* #ifdef DEBUG */
-/*     /\* using #ifdef inside macro (EXEC_THROUGH_EDGES) gives compiler warning *\/ */
-/*     if (num_fourcycles_node(nwp, vnode, sto1) != vcount) error("b1np4c incorrect fourcycle count [2] for %d correct %lu got %lu\n", vnode, num_fourcycles_node(nwp, vnode, sto1), vcount); */
-/* #endif /\* DEBUG *\/ */
+#ifdef DEBUG
+    /* using #ifdef inside macro (EXEC_THROUGH_EDGES) gives compiler warning */
+    if (num_fourcycles_node(nwp, vnode, sto1) != vcount) error("b1np4c incorrect fourcycle count [2] for %d correct %lu got %lu\n", vnode, num_fourcycles_node(nwp, vnode, sto1), vcount);
+#endif /* DEBUG */
     delta = twopaths(nwp, vnode, b1, 0, 0);
     change += pow(vcount + delta, alpha) - pow(vcount, alpha);
   });
@@ -459,10 +461,10 @@ C_CHANGESTAT_FN(c_b2np4c) {
   /* add contribution from sum over neighbours of b1 */
   EXEC_THROUGH_EDGES(b1, edge, vnode, { /* step through edges of b1 */
     vcount = sto2->fourcycle_count[vnode-BIPARTITE-1];
-/* #ifdef DEBUG */
-/*     /\* using #ifdef inside macro (EXEC_THROUGH_EDGES) gives compiler warning *\/ */
-/*     if (num_fourcycles_node(nwp, vnode, sto2) != vcount) error("b2np4c incorrect fourcycle count [2] for %d correct %lu got %lu\n", vnode, num_fourcycles_node(nwp, vnode, sto2), vcount); */
-/* #endif /\* DEBUG *\/ */
+#ifdef DEBUG
+    /* using #ifdef inside macro (EXEC_THROUGH_EDGES) gives compiler warning */
+    if (num_fourcycles_node(nwp, vnode, sto2) != vcount) error("b2np4c incorrect fourcycle count [2] for %d correct %lu got %lu\n", vnode, num_fourcycles_node(nwp, vnode, sto2), vcount);
+#endif /* DEBUG */
     delta = twopaths(nwp, vnode, b2, 0, 0);
     change += pow(vcount + delta, alpha) - pow(vcount, alpha);
   })
