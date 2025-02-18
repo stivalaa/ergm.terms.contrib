@@ -106,16 +106,16 @@ static unsigned int twopaths(Network *nwp, Vertex i, Vertex j,
      to step through all outedges and also through all inedges */
   STEP_THROUGH_OUTEDGES(i, edge1, vnode) {     /* i -- v */
     if (vnode == i || vnode == j ||
-        i == ignore1 && vnode == ignore2 || i == ignore2 && vnode == ignore1)
+        (i == ignore1 && vnode == ignore2) || i == (ignore2 && vnode == ignore1))
       continue;
     STEP_THROUGH_OUTEDGES(j, edge2, wnode) {
-      if (j == ignore1 && wnode == ignore2 || j == ignore2 && wnode == ignore1)
+      if ((j == ignore1 && wnode == ignore2) || (j == ignore2 && wnode == ignore1))
         continue;
       if (wnode == vnode)     /* v -- j */
         count++;
     }
     STEP_THROUGH_INEDGES(j, edge2, wnode) {
-      if (j == ignore1 && wnode == ignore2 || j == ignore2 && wnode == ignore1)
+      if ((j == ignore1 && wnode == ignore2) || (j == ignore2 && wnode == ignore1))
         continue;
       if (wnode == vnode)      /* v -- j */
         count++;
@@ -123,16 +123,16 @@ static unsigned int twopaths(Network *nwp, Vertex i, Vertex j,
   }
   STEP_THROUGH_INEDGES(i, edge1, vnode) {     /* i -- v */
     if (vnode == i || vnode == j ||
-        i == ignore1 && vnode == ignore2 || i == ignore2 && vnode == ignore1)
+        (i == ignore1 && vnode == ignore2) || (i == ignore2 && vnode == ignore1))
       continue;
     STEP_THROUGH_OUTEDGES(j, edge2, wnode) {
-      if (j == ignore1 && wnode == ignore2 || j == ignore2 && wnode == ignore1)
+      if ((j == ignore1 && wnode == ignore2) || (j == ignore2 && wnode == ignore1))
         continue;
       if (wnode == vnode)     /* v -- j */
         count++;
     }
     STEP_THROUGH_INEDGES(j, edge2, wnode) {
-      if (j == ignore1 && wnode == ignore2 || j == ignore2 && wnode == ignore1)
+      if ((j == ignore1 && wnode == ignore2) || j == (ignore2 && wnode == ignore1))
         continue;
       if (wnode == vnode)      /* v -- j */
         count++;
@@ -216,12 +216,12 @@ static unsigned long change_fourcycles(Network *nwp, Vertex i, Vertex j,
      tail < head, so to step through all edges of a node it is necessary
      to step through all outedges and also through all inedges */
   STEP_THROUGH_OUTEDGES(i, edge, vnode) {
-    if (i == ignore1 && vnode == ignore2 || i == ignore2 && vnode == ignore1)
+    if ((i == ignore1 && vnode == ignore2) || (i == ignore2 && vnode == ignore1))
       continue;
     delta += twopaths(nwp, vnode, j, ignore1, ignore2);
   }
   STEP_THROUGH_INEDGES(i, edge, vnode) {
-    if (i == ignore1 && vnode == ignore2 || i == ignore2 && vnode == ignore1)
+    if ((i == ignore1 && vnode == ignore2) || (i == ignore2 && vnode == ignore1))
       continue;
     delta += twopaths(nwp, vnode, j, ignore1, ignore2);
   }
