@@ -294,50 +294,24 @@ I_CHANGESTAT_FN(i_b2np4c) {
    https://cran.r-project.org/web/packages/ergm/vignettes/Terms-API.html
 */
 U_CHANGESTAT_FN(u_b1np4c) {
-  long delta;
-   unsigned long vcount;
-  Vertex b1, b2;
-  int is_delete;
+  unsigned long delta;
+  Vertex b1 = tail, b2 = head;
+  int is_delete = edgestate;
 
-  fprintf(stderr, "XXX u_b1np4c entered b1 = %d\n", tail);
-
+  fprintf(stderr, "XXX u_b1np4c entered b1 = %d is_delete = %d\n", b1, is_delete);
   GET_STORAGE(bnp4c_storage_t, sto1); /* Obtain a pointer to private storage
                                          and cast it to the correct type. */
-  b1 = tail;
-  b2 = head;
-  is_delete = edgestate;
-
-  /* NOTE: For a delete move, we actually toggle the edge ourselves here so
-   * that the proposed edge is always NOT present for all the calculations
-   * as they involve counting two-paths and four-cycles, on the assumption
-   * that the proposed edge does not (yet) exist. We must therefore
-   * also add it back afterwards to fit in with the standard logic.
-   */
-  if (is_delete) {
-    TOGGLE(b1, b2);
-  }
-  if (IS_UNDIRECTED_EDGE(b1, b2)) error("Edge must not exist\n");
-
   /* change statistic for four-cycles */
-  delta = change_fourcycles(nwp, b1, b2, 0, 0);
-
+  delta = change_fourcycles(nwp, b1, b2, b1, b2);
   sto1->fourcycle_count[b1-1] += is_delete ? -delta : delta;
-   fprintf(stderr, "u_b1np4c for %d added %ld to get %lu\n", b1, delta,sto1->fourcycle_count[b1-1]);
+  fprintf(stderr, "u_b1np4c for %d added %ld to get %lu\n", b1, delta,sto1->fourcycle_count[b1-1]);
   /* add also have to update neighbours of b2 */
   EXEC_THROUGH_EDGES(b2, edge, vnode,  { /* step through edges of b2 */
-     vcount = sto1->fourcycle_count[vnode-1];
-     if (num_fourcycles_node(nwp, vnode, sto1) != vcount) error("u_b1np4c incorrect fourcycle count for %d correct %lu got %lu\n", vnode, num_fourcycles_node(nwp, vnode, sto1), vcount);
-    delta = twopaths(nwp, vnode, b1, 0, 0);
+    if (vnode == b1) continue; /* except for b1 -- b2 edge (if is_delete) */   
+    delta = twopaths(nwp, vnode, b1, b1, b2);
     sto1->fourcycle_count[vnode-1] += is_delete ? -delta : delta;
-     fprintf(stderr, "u_b1np4c for %d added %ld to get %lu\n",vnode, delta,sto1->fourcycle_count[vnode-1]);
+    fprintf(stderr, "u_b1np4c for %d added %ld to get %lu\n",vnode-1, delta,sto1->fourcycle_count[vnode-1]);
   });
-  
-
-  /* For a delete move, we deleted the edge at the start, now add it again */
-  if (is_delete) {
-    TOGGLE(b1, b2);
-    if (!IS_UNDIRECTED_EDGE(b1, b2)) error("Edge must exist\n");
-  }
   fprintf(stderr, "XXX u_b1np4c exit\n");
 }
 
@@ -395,7 +369,7 @@ C_CHANGESTAT_FN(c_b1np4c) {
 
   /* Number of four-cycles the node is already involved in */
   count = sto1->fourcycle_count[b1-1];
-   if (num_fourcycles_node(nwp, b1, sto1) != count) error("b1np4c incorrect fourcycle count [1] for %d correct %lu got %lu\n", b1, num_fourcycles_node(nwp, b1, sto1), count);
+  if (num_fourcycles_node(nwp, b1, sto1) != count) error("b1np4c incorrect fourcycle count [1] for %d correct %lu got %lu\n", b1, num_fourcycles_node(nwp, b1, sto1), count);
 
   /* change statistic for four-cycles */
   delta = change_fourcycles(nwp, b1, b2, 0, 0);
@@ -454,7 +428,7 @@ C_CHANGESTAT_FN(c_b2np4c) {
 
   /* Number of four-cycles the node is already involved in */
   count = sto2->fourcycle_count[b2-1];
-   if (num_fourcycles_node(nwp, b2, sto2) != count) error("b2np4c incorrect fourcycle count [1] for %d correct %lu got %lu\n", b2, num_fourcycles_node(nwp, b2, sto2), count);
+  if (num_fourcycles_node(nwp, b2, sto2) != count) error("b2np4c incorrect fourcycle count [1] for %d correct %lu got %lu\n", b2, num_fourcycles_node(nwp, b2, sto2), count);
 
   /* change statistic for four-cycles */
   delta = change_fourcycles(nwp, b1, b2, 0, 0);
