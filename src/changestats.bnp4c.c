@@ -350,7 +350,7 @@ U_CHANGESTAT_FN(u_b2np4c) {
   GET_STORAGE(bnp4c_storage_t, sto2); /* Obtain a pointer to private storage
                                          and cast it to the correct type. */
   /* change statistic for four-cycles */
-  delta = change_fourcycles(nwp, b1, b2, 0, 0);
+  delta = change_fourcycles(nwp, b1, b2, b1, b2);
   sto2->fourcycle_count[b2-1] += is_delete ? -delta : delta;
   fprintf(stderr, "u_b2np4c [1] %d added %ld to get %lu\n", b2-1, is_delete ? -delta : delta, sto2->fourcycle_count[b2-1]);
   /* also changes four-cycle counts for neighbours of b1 */
