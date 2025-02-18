@@ -59,8 +59,6 @@ typedef struct bnp4c_storage_s {
   int            *visited;         /* visited flag for each node
                                       (working storage) */
   unsigned long  *fourcycle_count; /* number of four-cycles at each node */
-  unsigned long  *delta_value;     /* communicate delta from c_ function to
-                                      u_ function */
   Rboolean        do_update;       /* if TRUE, u_ function does NOT update
                                       counts */
 } bnp4c_storage_t;
@@ -230,10 +228,7 @@ static unsigned long change_fourcycles(Network *nwp, Vertex i, Vertex j) {
 /*
  * The change statitsics functions (c_) use private storage to communicate
  * with the update functions (u_). The c_ functions use the four-cycles
- * counts in fourcycle_count, which are updated by the u_ functions
- * based on the delta_value set by the c_ functions, so that
- * there is no need to recompute the delta values in the u_ functions
- * or the counts themseles in the c_ functions.
+ * counts in fourcycle_count, which are updated by the u_ functions.
  */
 
 
@@ -243,7 +238,6 @@ I_CHANGESTAT_FN(i_b1np4c) {
   ALLOC_STORAGE(1, bnp4c_storage_t, sto1);
   sto1->visited = R_Calloc(N_NODES, int);
   sto1->fourcycle_count = R_Calloc(N_NODES, unsigned long);
-  sto1->delta_value = R_Calloc(N_NODES, unsigned long);
   for (int i = 1; i <= N_NODES; i++) {
     sto1->fourcycle_count[i-1] = num_fourcycles_node(nwp, i, sto1);
      fprintf(stderr, "i_b1np4c %d set to %lu\n", i, sto1->fourcycle_count[i-1]);
@@ -255,7 +249,6 @@ I_CHANGESTAT_FN(i_b2np4c) {
   ALLOC_STORAGE(1, bnp4c_storage_t, sto2);
   sto2->visited = R_Calloc(N_NODES, int);
   sto2->fourcycle_count = R_Calloc(N_NODES, unsigned long);
-  sto2->delta_value = R_Calloc(N_NODES, unsigned long);
   for (int i = 1; i <= N_NODES; i++) {
     sto2->fourcycle_count[i-1] = num_fourcycles_node(nwp, i, sto2);
      fprintf(stderr, "i_b2np4c %d set to %lu\n", i, sto2->fourcycle_count[i-1]);
@@ -324,22 +317,23 @@ U_CHANGESTAT_FN(u_b1np4c) {
 }
 
 U_CHANGESTAT_FN(u_b2np4c) {
-  long delta;
-  unsigned long vcount;
-  Vertex b2;
+  unsigned long delta;
   int is_delete = edgestate;
+  Vertex b1 = tail, b2 = head;
 
-  fprintf(stderr, "XXX u_b2np4c entered b2 = %d\n", head);
+  fprintf(stderr, "XXX u_b2np4c entered b2 = %d is_delete = %d\n", b2, is_delete);
   GET_STORAGE(bnp4c_storage_t, sto2); /* Obtain a pointer to private storage
                                          and cast it to the correct type. */
-  if (!sto2->do_update) {
-    fprintf(stderr, "XXX u_b2np4c exit with no update\n");
-    return;
-  }
-  for (int i = 0; i < N_NODES; i++) {
-    sto2->fourcycle_count[i] += is_delete ? -sto2->delta_value[i] : sto2->delta_value[i];
-    fprintf(stderr, "u_b2np4c %d add added %ld to get to %lu\n", i+1, is_delete ? -sto2->delta_value[i] : sto2->delta_value[i], sto2->fourcycle_count[i]);
-  }
+  /* change statistic for four-cycles */
+  delta = change_fourcycles(nwp, tail, head);
+  sto2->fourcycle_count[b2-1] += is_delete ? -delta : delta;
+  fprintf(stderr, "u_b2np4c [1] %d added %ld to get %lu\n", b2-1, is_delete ? -delta : delta, sto2->fourcycle_count[b2-1]);
+  /* also changes four-cycle counts for neighbours of b1 */
+  EXEC_THROUGH_EDGES(b1, edge, vnode, { /* step through edges of b1 */
+    delta = twopaths(nwp, vnode, b2);
+    sto2->fourcycle_count[vnode-1] += is_delete ? - delta : delta;
+    fprintf(stderr, "u_b2np4c [2] %d added %ld to get %lu\n", vnode-1, is_delete ? -delta : delta, sto2->fourcycle_count[vnode-1]);    
+  })
   fprintf(stderr, "XXX u_b2np4c exit\n");  
 }
 
@@ -420,10 +414,6 @@ C_CHANGESTAT_FN(c_b2np4c) {
   b2 = head;
   is_delete = IS_UNDIRECTED_EDGE(b1, b2);
 
-  /* Reset delta values to all zero. Important to do this before
-     possible call to TOGGLE below since that will call u_b2np4c() */
-  memset(sto2->delta_value, 0, sizeof(sto2->delta_value[0])*N_NODES);
-
   /* NOTE: For a delete move, we actually toggle the edge ourselves here so
    * that the proposed edge is always NOT present for all the calculations
    * as they involve counting two-paths and four-cycles, on the assumption
@@ -432,9 +422,7 @@ C_CHANGESTAT_FN(c_b2np4c) {
    */
   if (is_delete) {
     fprintf(stderr, " c_b2np4c is_delete TOGGLE\n");
-    sto2->do_update = FALSE;
     TOGGLE(b1, b2);
-    sto2->do_update = TRUE;
   }
   if (IS_UNDIRECTED_EDGE(b1, b2)) error("Edge must not exist\n");
 
@@ -444,8 +432,6 @@ C_CHANGESTAT_FN(c_b2np4c) {
 
   /* change statistic for four-cycles */
   delta = change_fourcycles(nwp, b1, b2);
-  sto2->delta_value[b2-1] = delta;
-  fprintf(stderr, "c_b2np4c [1] %d delta_value set to %lu\n", b2, sto2->delta_value[b2-1]);
   change = pow(count + delta, alpha) - pow(count, alpha);
 
   /* add contribution from sum over neighbours of b1 */
@@ -453,8 +439,6 @@ C_CHANGESTAT_FN(c_b2np4c) {
     vcount = sto2->fourcycle_count[vnode-1];
     if (num_fourcycles_node(nwp, vnode, sto2) != vcount) error("b2np4c incorrect fourcycle count [2] for %d correct %lu got %lu\n", vnode, num_fourcycles_node(nwp, vnode, sto2), vcount);
     delta = twopaths(nwp, vnode, b2);
-    sto2->delta_value[vnode-1] = delta;
-    fprintf(stderr, "c_b2np4c [2] %d delta_value set to %lu\n", vnode, sto2->delta_value[vnode-1]);    
     change += pow(vcount + delta, alpha) - pow(vcount, alpha);
   })
   CHANGE_STAT[0] += is_delete ? -change : change;
@@ -485,7 +469,6 @@ F_CHANGESTAT_FN(f_b1np4c) {
   GET_STORAGE(bnp4c_storage_t, sto1);
   R_Free(sto1->visited);
   R_Free(sto1->fourcycle_count);
-  R_Free(sto1->delta_value);
 }
 
 F_CHANGESTAT_FN(f_b2np4c) {
@@ -493,5 +476,4 @@ F_CHANGESTAT_FN(f_b2np4c) {
   GET_STORAGE(bnp4c_storage_t, sto2);
   R_Free(sto2->visited);
   R_Free(sto2->fourcycle_count);
-  R_Free(sto2->delta_value);
 }
