@@ -56,17 +56,21 @@
 
 
  /* private storage struct for b1np4c and b2np4c */
-/* These are just allocated as arrays of length N_NODES for simplicity;
- * they could perhaps more appropriately be hash tables, but, unlike the case
- * for dyadic properties and so would require N^2 storage, it is not
- * too inefficient to require N storage here.
- * Note than indexing in these two arrays is 0..N_NODES-1 so
- * must subtract one when indexing from a Vertex which
- * is 1..N_NODES (R style) */
+/* These are just allocated as arrays of length N_NODES (for visited,
+ * and number of nodes in the relevant bipartition for
+ * fourcycle_count) for simplicity; they could perhaps more
+ * appropriately be hash tables, but, unlike the case for dyadic
+ * properties and so would require N^2 storage, it is not too
+ * inefficient to require N storage here.  Note than indexing in these
+ * two arrays is 0..N_NODES-1 so must subtract one when indexing from
+ * a Vertex which is 1..N_NODES (R style) */
 typedef struct bnp4c_storage_s {
   int            *visited;         /* visited flag for each node
-                                      (working storage) */
-  unsigned long  *fourcycle_count; /* number of four-cycles at each node */
+                                      (working storage), size N_NODES */
+  unsigned long  *fourcycle_count; /* number of four-cycles at each node
+                                    in the relevant bipartition:
+                                    BIPARTITE for b1 and N_NODES-BIPARTITE
+                                    for b2 */
 } bnp4c_storage_t;
 
 
@@ -255,6 +259,13 @@ static unsigned long change_fourcycles(Network *nwp, Vertex i, Vertex j,
  * indegree.
  */
 
+/*
+ * From ergm_changestat_common.do_not_include_directly.h:
+ * BIPARTITE is
+ *   0 if network is not bipartite, otherwise number of nodes of the
+ *   first type (the first node of the second type has Vertex index
+ *   BIPARTITE+1
+ */
 
 /*
  * The change statitsics functions (c_) use private storage to communicate
@@ -268,8 +279,9 @@ static unsigned long change_fourcycles(Network *nwp, Vertex i, Vertex j,
 I_CHANGESTAT_FN(i_b1np4c) {
   ALLOC_STORAGE(1, bnp4c_storage_t, sto1);
   sto1->visited = R_Calloc(N_NODES, int);
-  sto1->fourcycle_count = R_Calloc(N_NODES, unsigned long);
-  for (int i = 1; i <= N_NODES; i++) {
+  if (BIPARTITE == 0) error("Network must be bipartite\n");
+  sto1->fourcycle_count = R_Calloc(BIPARTITE, unsigned long);
+  for (int i = 1; i <= BIPARTITE; i++) {
     sto1->fourcycle_count[i-1] = num_fourcycles_node(nwp, i, sto1);
     DEBUG_PRINT(("i_b1np4c %d set to %lu\n", i, sto1->fourcycle_count[i-1]));
   }
@@ -278,10 +290,11 @@ I_CHANGESTAT_FN(i_b1np4c) {
 I_CHANGESTAT_FN(i_b2np4c) {
   ALLOC_STORAGE(1, bnp4c_storage_t, sto2);
   sto2->visited = R_Calloc(N_NODES, int);
-  sto2->fourcycle_count = R_Calloc(N_NODES, unsigned long);
-  for (int i = 1; i <= N_NODES; i++) {
-    sto2->fourcycle_count[i-1] = num_fourcycles_node(nwp, i, sto2);
-    DEBUG_PRINT(("i_b2np4c %d set to %lu\n", i, sto2->fourcycle_count[i-1]));
+  if (BIPARTITE == 0) error("Network must be bipartite\n");  
+  sto2->fourcycle_count = R_Calloc(N_NODES-BIPARTITE, unsigned long);
+  for (int i = BIPARTITE+1; i <= N_NODES; i++) {
+    sto2->fourcycle_count[i-BIPARTITE-1] = num_fourcycles_node(nwp, i, sto2);
+    DEBUG_PRINT(("i_b2np4c %d set to %lu\n", i, sto2->fourcycle_count[i-BIPARTITE-1]));
   }
 }
 
@@ -329,14 +342,14 @@ U_CHANGESTAT_FN(u_b2np4c) {
                                          and cast it to the correct type. */
   /* change statistic for four-cycles */
   delta = change_fourcycles(nwp, b1, b2, b1, b2);
-  sto2->fourcycle_count[b2-1] += is_delete ? -delta : delta;
-  DEBUG_PRINT(("u_b2np4c [1] %d added %ld to get %lu\n", b2-1, is_delete ? -delta : delta, sto2->fourcycle_count[b2-1]));
+  sto2->fourcycle_count[b2-BIPARTITE-1] += is_delete ? -delta : delta;
+  DEBUG_PRINT(("u_b2np4c [1] %d added %ld to get %lu\n", b2-BIPARTITE-1, is_delete ? -delta : delta, sto2->fourcycle_count[b2-BIPARTITE-1]));
   /* also changes four-cycle counts for neighbours of b1 */
   EXEC_THROUGH_EDGES(b1, edge, vnode, { /* step through edges of b1 */
     if (vnode == b2) continue; /* except for b1 -- b2 edge (if is_delete) */
     delta = twopaths(nwp, vnode, b2, b1, b2);
-    sto2->fourcycle_count[vnode-1] += is_delete ? - delta : delta;
-    DEBUG_PRINT(("u_b2np4c [2] %d added %ld to get %lu\n", vnode-1, is_delete ? -delta : delta, sto2->fourcycle_count[vnode-1]));    
+    sto2->fourcycle_count[vnode-BIPARTITE-1] += is_delete ? - delta : delta;
+    DEBUG_PRINT(("u_b2np4c [2] %d added %ld to get %lu\n", vnode-BIPARTITE-1, is_delete ? -delta : delta, sto2->fourcycle_count[vnode-BIPARTITE-1]));    
   })
   DEBUG_PRINT(("XXX u_b2np4c exit\n"));  
 }
@@ -435,7 +448,7 @@ C_CHANGESTAT_FN(c_b2np4c) {
   if (IS_UNDIRECTED_EDGE(b1, b2)) error("Edge must not exist\n");
 
   /* Number of four-cycles the node is already involved in */
-  count = sto2->fourcycle_count[b2-1];
+  count = sto2->fourcycle_count[b2-BIPARTITE-1];
 #ifdef DEBUG
   if (num_fourcycles_node(nwp, b2, sto2) != count) error("b2np4c incorrect fourcycle count [1] for %d correct %lu got %lu\n", b2, num_fourcycles_node(nwp, b2, sto2), count);
 #endif /* DEBUG */
@@ -445,7 +458,7 @@ C_CHANGESTAT_FN(c_b2np4c) {
 
   /* add contribution from sum over neighbours of b1 */
   EXEC_THROUGH_EDGES(b1, edge, vnode, { /* step through edges of b1 */
-    vcount = sto2->fourcycle_count[vnode-1];
+    vcount = sto2->fourcycle_count[vnode-BIPARTITE-1];
 /* #ifdef DEBUG */
 /*     /\* using #ifdef inside macro (EXEC_THROUGH_EDGES) gives compiler warning *\/ */
 /*     if (num_fourcycles_node(nwp, vnode, sto2) != vcount) error("b2np4c incorrect fourcycle count [2] for %d correct %lu got %lu\n", vnode, num_fourcycles_node(nwp, vnode, sto2), vcount); */
