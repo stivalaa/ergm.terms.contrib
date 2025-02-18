@@ -216,9 +216,13 @@ static unsigned long change_fourcycles(Network *nwp, Vertex i, Vertex j,
      tail < head, so to step through all edges of a node it is necessary
      to step through all outedges and also through all inedges */
   STEP_THROUGH_OUTEDGES(i, edge, vnode) {
+    if (i == ignore1 && vnode == ignore2 || i == ignore2 && vnode == ignore1)
+      continue;
     delta += twopaths(nwp, vnode, j, ignore1, ignore2);
   }
   STEP_THROUGH_INEDGES(i, edge, vnode) {
+    if (i == ignore1 && vnode == ignore2 || i == ignore2 && vnode == ignore1)
+      continue;
     delta += twopaths(nwp, vnode, j, ignore1, ignore2);
   }
   return delta;
