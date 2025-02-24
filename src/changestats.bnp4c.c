@@ -324,7 +324,7 @@ U_CHANGESTAT_FN(u_b1np4c) {
   DEBUG_PRINT(("u_b1np4c for %d added %ld to get %lu\n", b1, delta,sto1->fourcycle_count[b1-1]));
   /* add also have to update neighbours of b2 */
   EXEC_THROUGH_EDGES(b2, edge, vnode,  { /* step through edges of b2 */
-    if (vnode == b1) continue; /* except for b1 -- b2 edge (if is_delete) */   
+    if (vnode == b1) continue; /* except for b1 -- b2 edge (if is_delete) */
     delta = twopaths(nwp, vnode, b1, b1, b2);
     sto1->fourcycle_count[vnode-1] += is_delete ? -delta : delta;
     DEBUG_PRINT(("u_b1np4c for %d added %ld to get %lu\n",vnode-1, delta,sto1->fourcycle_count[vnode-1]));
@@ -384,7 +384,8 @@ C_CHANGESTAT_FN(c_b1np4c) {
 
   /* add contribution from sum over neighbours of b2 */
   EXEC_THROUGH_EDGES(b2, edge, vnode,  { /* step through edges of b2 */
-    if (vnode == b1) continue; /* except for b1 -- b2 edge (if is_delete) */       vcount = sto1->fourcycle_count[vnode-1];
+    if (vnode == b1) continue; /* except for b1 -- b2 edge (if is_delete) */
+    vcount = sto1->fourcycle_count[vnode-1];
 /* #ifdef DEBUG */
 /*     /\* using #ifdef inside macro (EXEC_THROUGH_EDGES) gives compiler warning *\/ */
 /*     if (num_fourcycles_node(nwp, vnode, sto1) != vcount) error("b1np4c incorrect fourcycle count [2] for %d correct %lu got %lu\n", vnode, num_fourcycles_node(nwp, vnode, sto1), vcount); */
@@ -429,7 +430,7 @@ C_CHANGESTAT_FN(c_b2np4c) {
 
   /* add contribution from sum over neighbours of b1 */
   EXEC_THROUGH_EDGES(b1, edge, vnode, { /* step through edges of b1 */
-    if (vnode == b1) continue; /* except for b1 -- b2 edge (if is_delete) */   
+    if (vnode == b1) continue; /* except for b1 -- b2 edge (if is_delete) */
     vcount = sto2->fourcycle_count[vnode-BIPARTITE-1];
 /* #ifdef DEBUG */
 /*     /\* using #ifdef inside macro (EXEC_THROUGH_EDGES) gives compiler warning *\/ */
