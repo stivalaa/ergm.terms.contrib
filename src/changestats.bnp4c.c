@@ -401,15 +401,10 @@ C_CHANGESTAT_FN(c_b1np4c) {
 /*     /\* using #ifdef inside macro (EXEC_THROUGH_EDGES) gives compiler warning *\/ */
 /*     if (num_fourcycles_node(nwp, vnode, sto1) != vcount) error("b1np4c incorrect fourcycle count [2] for %d correct %lu got %lu\n", vnode, num_fourcycles_node(nwp, vnode, sto1), vcount); */
 /* #endif /\* DEBUG *\/ */
-    delta = twopaths(nwp, vnode, b1, 0, 0);
+    delta = twopaths(nwp, vnode, b1, b1, b2);
     change += pow(vcount + delta, alpha) - pow(vcount, alpha);
   });
   CHANGE_STAT[0] += IS_UNDIRECTED_EDGE(b1, b2) ? -change : change;
-  /* For a delete move, we deleted the edge at the start, now add it again */
-  if (is_delete) {
-    TOGGLE(b1, b2);
-    if (!IS_UNDIRECTED_EDGE(b1, b2)) error("Edge must exist\n");
-  }
   DEBUG_PRINT(("XXX c_b1np4c exit\n"));
 }
 
@@ -436,29 +431,18 @@ C_CHANGESTAT_FN(c_b2np4c) {
   b2 = head;
   is_delete = IS_UNDIRECTED_EDGE(b1, b2);
 
-  /* NOTE: For a delete move, we actually toggle the edge ourselves here so
-   * that the proposed edge is always NOT present for all the calculations
-   * as they involve counting two-paths and four-cycles, on the assumption
-   * that the proposed edge does not (yet) exist. We must therefore
-   * also add it back afterwards to fit in with the standard logic.
-   */
-  if (is_delete) {
-    DEBUG_PRINT((" c_b2np4c is_delete TOGGLE\n"));
-    TOGGLE(b1, b2);
-  }
-  if (IS_UNDIRECTED_EDGE(b1, b2)) error("Edge must not exist\n");
-
   /* Number of four-cycles the node is already involved in */
   count = sto2->fourcycle_count[b2-BIPARTITE-1];
 #ifdef DEBUG
   if (num_fourcycles_node(nwp, b2, sto2) != count) error("b2np4c incorrect fourcycle count [1] for %d correct %lu got %lu\n", b2, num_fourcycles_node(nwp, b2, sto2), count);
 #endif /* DEBUG */
   /* change statistic for four-cycles */
-  delta = change_fourcycles(nwp, b1, b2, 0, 0);
+  delta = change_fourcycles(nwp, b1, b2, b1, b2);
   change = pow(count + delta, alpha) - pow(count, alpha);
 
   /* add contribution from sum over neighbours of b1 */
   EXEC_THROUGH_EDGES(b1, edge, vnode, { /* step through edges of b1 */
+    if (vnode == b1) continue; /* except for b1 -- b2 edge (if is_delete) */   
     vcount = sto2->fourcycle_count[vnode-BIPARTITE-1];
 /* #ifdef DEBUG */
 /*     /\* using #ifdef inside macro (EXEC_THROUGH_EDGES) gives compiler warning *\/ */
