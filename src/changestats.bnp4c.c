@@ -363,7 +363,7 @@ C_CHANGESTAT_FN(c_b1np4c) {
   double change, alpha, delta;
   unsigned long count, vcount;
   Vertex b1, b2;
-  int is_delete;
+  int is_delete = edgestate;
 
   DEBUG_PRINT(("XXX c_b1np4c entered b1 = %d\n", tail));
   
@@ -373,17 +373,6 @@ C_CHANGESTAT_FN(c_b1np4c) {
 
   b1 = tail;
   b2 = head;
-  is_delete = IS_UNDIRECTED_EDGE(b1, b2);
-  /* NOTE: For a delete move, we actually toggle the edge ourselves here so
-   * that the proposed edge is always NOT present for all the calculations
-   * as they involve counting two-paths and four-cycles, on the assumption
-   * that the proposed edge does not (yet) exist. We must therefore
-   * also add it back afterwards to fit in with the standard logic.
-   */
-  if (is_delete) {
-    TOGGLE(b1, b2);
-  }
-  if (IS_UNDIRECTED_EDGE(b1, b2)) error("Edge must not exist\n");
 
   /* Number of four-cycles the node is already involved in */
   count = sto1->fourcycle_count[b1-1];
@@ -391,12 +380,12 @@ C_CHANGESTAT_FN(c_b1np4c) {
   if (num_fourcycles_node(nwp, b1, sto1) != count) error("b1np4c incorrect fourcycle count [1] for %d correct %lu got %lu\n", b1, num_fourcycles_node(nwp, b1, sto1), count);
 #endif /* DEBUG */
   /* change statistic for four-cycles */
-  delta = change_fourcycles(nwp, b1, b2, 0, 0);
+  delta = change_fourcycles(nwp, b1, b2, b1, b2);
   change = pow(count + delta, alpha) - pow(count, alpha);
 
   /* add contribution from sum over neighbours of b2 */
   EXEC_THROUGH_EDGES(b2, edge, vnode,  { /* step through edges of b2 */
-    vcount = sto1->fourcycle_count[vnode-1];
+    if (vnode == b1) continue; /* except for b1 -- b2 edge (if is_delete) */       vcount = sto1->fourcycle_count[vnode-1];
 /* #ifdef DEBUG */
 /*     /\* using #ifdef inside macro (EXEC_THROUGH_EDGES) gives compiler warning *\/ */
 /*     if (num_fourcycles_node(nwp, vnode, sto1) != vcount) error("b1np4c incorrect fourcycle count [2] for %d correct %lu got %lu\n", vnode, num_fourcycles_node(nwp, vnode, sto1), vcount); */
@@ -404,7 +393,7 @@ C_CHANGESTAT_FN(c_b1np4c) {
     delta = twopaths(nwp, vnode, b1, b1, b2);
     change += pow(vcount + delta, alpha) - pow(vcount, alpha);
   });
-  CHANGE_STAT[0] += IS_UNDIRECTED_EDGE(b1, b2) ? -change : change;
+  CHANGE_STAT[0] += is_delete ? -change : change;
   DEBUG_PRINT(("XXX c_b1np4c exit\n"));
 }
 
@@ -419,7 +408,7 @@ C_CHANGESTAT_FN(c_b2np4c) {
   double change, alpha, delta;
   unsigned long count, vcount;
   Vertex b1, b2;
-  int is_delete;
+  int is_delete = edgestate;
 
   DEBUG_PRINT(("XXX c_b2np4c entered b2 = %d edgestate = %d\n", head, edgestate));
 
@@ -429,7 +418,6 @@ C_CHANGESTAT_FN(c_b2np4c) {
 
   b1 = tail;
   b2 = head;
-  is_delete = IS_UNDIRECTED_EDGE(b1, b2);
 
   /* Number of four-cycles the node is already involved in */
   count = sto2->fourcycle_count[b2-BIPARTITE-1];
@@ -452,11 +440,6 @@ C_CHANGESTAT_FN(c_b2np4c) {
     change += pow(vcount + delta, alpha) - pow(vcount, alpha);
   })
   CHANGE_STAT[0] += is_delete ? -change : change;
-  /* For a delete move, we deleted the edge at the start, now add it again */
-  if (is_delete) {
-    TOGGLE(b1, b2);
-    if (!IS_UNDIRECTED_EDGE(b1, b2)) error("Edge must exist\n");
-  }
   DEBUG_PRINT(("XXX c_b2np4c exit\n"));
 }
 
