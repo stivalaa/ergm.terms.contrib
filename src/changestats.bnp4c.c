@@ -436,7 +436,7 @@ C_CHANGESTAT_FN(c_b2np4c) {
 /*     /\* using #ifdef inside macro (EXEC_THROUGH_EDGES) gives compiler warning *\/ */
 /*     if (num_fourcycles_node(nwp, vnode, sto2) != vcount) error("b2np4c incorrect fourcycle count [2] for %d correct %lu got %lu\n", vnode, num_fourcycles_node(nwp, vnode, sto2), vcount); */
 /* #endif /\* DEBUG *\/ */
-    delta = twopaths(nwp, vnode, b2, 0, 0);
+    delta = twopaths(nwp, vnode, b2, b1, b1);
     change += pow(vcount + delta, alpha) - pow(vcount, alpha);
   })
   CHANGE_STAT[0] += is_delete ? -change : change;
