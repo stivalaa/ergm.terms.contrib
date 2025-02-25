@@ -355,7 +355,7 @@ U_CHANGESTAT_FN(u_b2np4c) {
   EXEC_THROUGH_EDGES(b1, edge, vnode, { /* step through edges of b1 */
     if (vnode == b2) continue; /* except for b1 -- b2 edge (if is_delete) */
     delta = twopaths(nwp, vnode, b2, b1, b2);
-    sto2->fourcycle_count[vnode-BIPARTITE-1] += is_delete ? - delta : delta;
+    sto2->fourcycle_count[vnode-BIPARTITE-1] += is_delete ? -delta : delta;
     DEBUG_PRINT(("u_b2np4c [2] %d added %ld to get %lu\n", vnode-BIPARTITE-1, is_delete ? -delta : delta, sto2->fourcycle_count[vnode-BIPARTITE-1]));    
   })
   DEBUG_PRINT(("XXX u_b2np4c exit\n"));  
@@ -437,7 +437,7 @@ C_CHANGESTAT_FN(c_b2np4c) {
 
   /* add contribution from sum over neighbours of b1 */
   EXEC_THROUGH_EDGES(b1, edge, vnode, { /* step through edges of b1 */
-    if (vnode == b1) continue; /* except for b1 -- b2 edge (if is_delete) */
+    if (vnode == b2) continue; /* except for b1 -- b2 edge (if is_delete) */
     vcount = sto2->fourcycle_count[vnode-BIPARTITE-1];
 /* #ifndef DEBUG//XXX */
 /*     /\* using #ifdef inside macro (EXEC_THROUGH_EDGES) gives compiler warning *\/ */
