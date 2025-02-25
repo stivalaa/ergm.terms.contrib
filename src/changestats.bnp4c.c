@@ -121,7 +121,7 @@ static unsigned int twopaths(Network *nwp, Vertex i, Vertex j,
      to step through all outedges and also through all inedges */
   STEP_THROUGH_OUTEDGES(i, edge1, vnode) {     /* i -- v */
     if (vnode == i || vnode == j ||
-        (i == ignore1 && vnode == ignore2) || i == (ignore2 && vnode == ignore1))
+        (i == ignore1 && vnode == ignore2) || (i == ignore2 && vnode == ignore1))
       continue;
     STEP_THROUGH_OUTEDGES(j, edge2, wnode) {
       if ((j == ignore1 && wnode == ignore2) || (j == ignore2 && wnode == ignore1))
