@@ -40,6 +40,7 @@
 #include "ergm_changestat.h"
 #include "ergm_storage.h"
 
+#define DEBUG //XXX
 #ifdef DEBUG
 #define DEBUG_PRINT(x) printf("DEBUG BNP4C: "); printf x
 #else
@@ -393,10 +394,10 @@ C_CHANGESTAT_FN(c_b1np4c) {
   EXEC_THROUGH_EDGES(b2, edge, vnode,  { /* step through edges of b2 */
     if (vnode == b1) continue; /* except for b1 -- b2 edge (if is_delete) */
     vcount = sto1->fourcycle_count[vnode-1];
-/* #ifdef DEBUG */
-/*     /\* using #ifdef inside macro (EXEC_THROUGH_EDGES) gives compiler warning *\/ */
-/*     if (num_fourcycles_node(nwp, vnode, sto1) != vcount) error("b1np4c incorrect fourcycle count [2] for %d correct %lu got %lu\n", vnode, num_fourcycles_node(nwp, vnode, sto1), vcount); */
-/* #endif /\* DEBUG *\/ */
+#ifdef DEBUG
+    /* using #ifdef inside macro (EXEC_THROUGH_EDGES) gives compiler warning */
+    if (num_fourcycles_node(nwp, vnode, sto1) != vcount) error("b1np4c incorrect fourcycle count [2] for %d correct %lu got %lu\n", vnode, num_fourcycles_node(nwp, vnode, sto1), vcount);
+#endif /* DEBUG */
     delta = twopaths(nwp, vnode, b1, b1, b2);
     change += pow(vcount + delta, alpha) - pow(vcount, alpha);
   });
@@ -428,9 +429,9 @@ C_CHANGESTAT_FN(c_b2np4c) {
 
   /* Number of four-cycles the node is already involved in */
   count = sto2->fourcycle_count[b2-BIPARTITE-1];
-/* #ifndef DEBUG */
-/*   if (num_fourcycles_node(nwp, b2, sto2) != count) error("b2np4c incorrect fourcycle count [1] for %d correct %lu got %lu\n", b2, num_fourcycles_node(nwp, b2, sto2), count); */
-/* #endif /\* DEBUG *\/ */
+#ifdef DEBUG
+  if (num_fourcycles_node(nwp, b2, sto2) != count) error("b2np4c incorrect fourcycle count [1] for %d correct %lu got %lu\n", b2, num_fourcycles_node(nwp, b2, sto2), count);
+#endif /* DEBUG */
   /* change statistic for four-cycles */
   delta = change_fourcycles(nwp, b1, b2, b1, b2);
   change = pow(count + delta, alpha) - pow(count, alpha);
@@ -439,11 +440,11 @@ C_CHANGESTAT_FN(c_b2np4c) {
   EXEC_THROUGH_EDGES(b1, edge, vnode, { /* step through edges of b1 */
     if (vnode == b2) continue; /* except for b1 -- b2 edge (if is_delete) */
     vcount = sto2->fourcycle_count[vnode-BIPARTITE-1];
-/* #ifndef DEBUG//XXX */
-/*     /\* using #ifdef inside macro (EXEC_THROUGH_EDGES) gives compiler warning *\/ */
-/*     if (num_fourcycles_node(nwp, vnode, sto2) != vcount) error("b2np4c incorrect fourcycle count [2] for %d correct %lu got %lu\n", vnode, num_fourcycles_node(nwp, vnode, sto2), vcount); */
-/* #endif /\* DEBUG *\/ */
-    delta = twopaths(nwp, vnode, b2, b1, b1);
+#ifdef DEBUG
+    /* using #ifdef inside macro (EXEC_THROUGH_EDGES) gives compiler warning */
+    if (num_fourcycles_node(nwp, vnode, sto2) != vcount) error("b2np4c incorrect fourcycle count [2] for %d correct %lu got %lu\n", vnode, num_fourcycles_node(nwp, vnode, sto2), vcount);
+#endif /* DEBUG */
+    delta = twopaths(nwp, vnode, b2, b1, b2);
     change += pow(vcount + delta, alpha) - pow(vcount, alpha);
   })
   CHANGE_STAT[0] += is_delete ? -change : change;
