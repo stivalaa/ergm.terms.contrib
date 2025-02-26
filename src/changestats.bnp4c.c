@@ -434,7 +434,7 @@ C_CHANGESTAT_FN(c_b2np4c) {
 #endif /* DEBUG */
   /* change statistic for four-cycles */
   delta = change_fourcycles(nwp, b1, b2, b1, b2);
-  change = pow(count + delta, alpha) - pow(count, alpha);
+  change = pow(count + (is_delete ? -delta : delta), alpha) - pow(count, alpha);
 
   /* add contribution from sum over neighbours of b1 */
   EXEC_THROUGH_EDGES(b1, edge, vnode, { /* step through edges of b1 */
@@ -445,7 +445,7 @@ C_CHANGESTAT_FN(c_b2np4c) {
     if (num_fourcycles_node(nwp, vnode, sto2) != vcount) error("b2np4c incorrect fourcycle count [2] for %d correct %lu got %lu\n", vnode, num_fourcycles_node(nwp, vnode, sto2), vcount);
 #endif /* DEBUG */
     delta = twopaths(nwp, vnode, b2, b1, b2);
-    change += pow(vcount + delta, alpha) - pow(vcount, alpha);
+    change += pow(vcount + (is_delete ? -delta : delta), alpha) - pow(vcount, alpha);
   })
   CHANGE_STAT[0] += is_delete ? -change : change;
   DEBUG_PRINT(("XXX c_b2np4c exit\n"));
