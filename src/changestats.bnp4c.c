@@ -209,7 +209,7 @@ static unsigned long num_fourcycles_node(Network *nwp, Vertex unode,
  * when edge i -- j is added
  *
  * If ignore1 and ignore2 are nonzero then the edge ignore1 -- ignore2
- * is not not included in traversals (treated as if it does not exist)
+ * is not included in traversals (treated as if it does not exist)
  *
  * (valid Vertices are numbered 1..N_NODES)
  */
