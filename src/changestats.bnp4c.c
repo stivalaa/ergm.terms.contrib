@@ -94,7 +94,7 @@ static unsigned long n_choose_2(int n)
  * number of undirected two-paths for (i, j): paths i -- v -- j for some v
  *
  * If ignore1 and ignore2 are nonzero then the edge ignore1 -- ignore2
- * is not not included in traversals (treated as if it does not exist)
+ * is not included in traversals (treated as if it does not exist)
  *
  * (valid Vertices are numbered 1..N_NODES)
  */
