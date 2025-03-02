@@ -394,7 +394,7 @@ C_CHANGESTAT_FN(c_b1np4c) {
     delta = twopaths(nwp, vnode, b1, b1, b2);
     change += is_delete ? pow(vcount, alpha) - pow(vcount - delta, alpha) :
       pow(vcount + delta, alpha) - pow(vcount, alpha);
-  });
+  })
   CHANGE_STAT[0] += is_delete ? -change : change;
   DEBUG_PRINT(("XXX c_b1np4c exit\n"));
 }
