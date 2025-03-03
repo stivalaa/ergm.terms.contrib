@@ -220,12 +220,6 @@ dev.off()
 plot_cycledist(davis, davis_model3, 'southern_women_model3_cycledist.eps')
 
 
-
-## Does not converge (Error in snearPD(V) : Matrix ‘x’ has negative elements on the diagonal):
-##system.time( davis_model4 <- ergm(davis ~ edges + gwb1degree(1, TRUE) + gwb2degree(1, TRUE) + b1np4c, control = control.ergm(main.method = "Stochastic-Approximation")) )
-##system.time( davis_model4 <- ergm(davis ~ edges + gwb1degree(1, TRUE) + gwb2degree(1, TRUE) + b2np4c, control = control.ergm(main.method = "Stochastic-Approximation")) )
-##system.time( davis_model4 <- ergm(davis ~ edges + gwb1degree(1, TRUE) + gwb2degree(1, TRUE) + b1np4c(1/5), control = control.ergm(main.method = "Stochastic-Approximation")) )
-
 ## Converges (only a minute or so). OK GoF:
 system.time( davis_model4 <- ergm(davis ~ edges + gwb1degree(1, TRUE) + gwb2degree(1, TRUE) + b2np4c(1/5), control = control.ergm(main.method = "Stochastic-Approximation")) )
 print(summary(davis_model4))
