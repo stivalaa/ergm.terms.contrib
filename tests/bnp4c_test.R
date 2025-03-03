@@ -1,4 +1,4 @@
-##
+s##
 ## File:    bnp4c.test.R
 ## Author:  Alex Stivala
 ## Created: December 2024
@@ -379,15 +379,12 @@ test_that('bnp4c terms delete move', {
   for (net in list(fourcycle.net, fourcycles3.net, fourcycles3.revmode.net,
                    fourcycles6.net, tencycle.net, star.net, starB.net,
                    fourfan3.net, fourfan.3.net)) {
-    print(net)#XXX
     for (b1 in 1:get.network.attribute(net, "bipartite")) {
       for (b2 in (get.network.attribute(net, "bipartite")+1) : get.network.attribute(net, "n")) {
-        print(c(b1, b2))#XXX
         res <- ergm.godfather(net ~ edges + cycle(4) + b1np4c(1) + b2np4c(1),
                               changes = rep(list(cbind(b1,b2)), 2),
                               stats.start = TRUE)
         ## toggling edge twice means stats must be back to their start values
-        print(res)#XXX
         expect_equal(as.vector(res[3, ]), as.vector(res[1, ]))
       }
     }
