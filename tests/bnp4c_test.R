@@ -370,9 +370,21 @@ test_that('bnp4c terms delete correct', {
   res <- ergm.godfather(fourcycle.net ~ edges + cycle(4) + b1np4c(1) + b2np4c(1),
                  changes = rep(list(cbind(1,3)), 2),
                  stats.start = TRUE)
-  print(res)#XXX
   expect_equal(as.vector(res[, "edges"]),          c(4, 3, 4))
   expect_equal(as.vector(res[, "cycle4"]),         c(1, 0, 1))
   expect_equal(as.vector(res[, "b1np4c.fixed.1"]), c(2, 0, 2))
   expect_equal(as.vector(res[, "b2np4c.fixed.1"]), c(2, 0, 2))
+
+
+  for (net in list(fourcycle.net, fourcycles3.net, fourcycles3.revmode.net,
+                   fourcycles6.net, tencycle.net, star.net, starB.net,
+                   fourfan3.net, fourfan.3.net)) {
+    print(net)#XXX
+    res <- ergm.godfather(net ~ edges + cycle(4) + b1np4c(1) + b2np4c(1),
+                          changes = rep(list(cbind(1,3)), 2),
+                          stats.start = TRUE)
+    ## toggling edge twice means stats must be back to their start values
+    print(res)#XXX
+    expect_equal(as.vector(res[3, ]), as.vector(res[1, ]))
+  }
 })
