@@ -362,7 +362,7 @@ test_that('bnp4c(1) is cycle(4)*2', {
 })
 
 
-test_that('bnp4c terms delete correct', {
+test_that('bnp4c terms delete move', {
   ##
   ## use ergm.godfather() to toggle edge twice, check we get correct
   ## values and in particular, back to the initial values.

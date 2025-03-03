@@ -40,6 +40,7 @@
 #include "ergm_changestat.h"
 #include "ergm_storage.h"
 
+#define DEBUG //XXX
 #ifdef DEBUG
 #define DEBUG_PRINT(x) printf("DEBUG BNP4C: "); printf x
 #else
@@ -365,13 +366,17 @@ C_CHANGESTAT_FN(c_b1np4c) {
   int is_delete = edgestate;
 
   DEBUG_PRINT(("XXX c_b1np4c entered b1 = %d\n", tail));
-  
+
   GET_STORAGE(bnp4c_storage_t, sto1); /* Obtain a pointer to private storage
                                        and cast it to the correct type. */
   alpha = INPUT_PARAM[0];
 
   b1 = tail;
   b2 = head;
+  if (b1 < 1 || b1 > BIPARTITE)
+    error("b1np4c bad tail %d (BIPARTITE = %d, N_NODES = %d)\n", b1, BIPARTITE, N_NODES);
+  if (b2 < BIPARTITE+1 || b2 > N_NODES)
+    error("b1np4c bad head %d (BIPARTITE = %d, N_NODES = %d)\n", b2, BIPARTITE, N_NODES);
 
   /* Number of four-cycles the node is already involved in */
   count = sto1->fourcycle_count[b1-1];
@@ -420,6 +425,10 @@ C_CHANGESTAT_FN(c_b2np4c) {
 
   b1 = tail;
   b2 = head;
+  if (b1 < 1 || b1 > BIPARTITE)
+    error("b2np4c bad tail %d (BIPARTITE = %d, N_NODES = %d)\n", b1, BIPARTITE, N_NODES);
+  if (b2 < BIPARTITE+1 || b2 > N_NODES)
+    error("b2np4c bad head %d (BIPARTITE = %d, N_NODES = %d)\n", b2, BIPARTITE, N_NODES);
 
   /* Number of four-cycles the node is already involved in */
   count = sto2->fourcycle_count[b2-BIPARTITE-1];
