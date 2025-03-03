@@ -385,13 +385,15 @@ test_that('bnp4c terms delete move multiple', {
   for (net in list(fourcycle.net, fourcycles3.net, fourcycles3.revmode.net,
                    fourcycles6.net, tencycle.net, star.net, starB.net,
                    fourfan3.net, fourfan.3.net)) {
-    for (b1 in 1:get.network.attribute(net, "bipartite")) {
-      for (b2 in (get.network.attribute(net, "bipartite")+1) : get.network.attribute(net, "n")) {
-        res <- ergm.godfather(net ~ edges + cycle(4) + b1np4c(1) + b2np4c(1),
-                              changes = rep(list(cbind(b1,b2)), 2),
-                              stats.start = TRUE)
-        ## toggling edge twice means stats must be back to their start values
-        expect_equal(as.vector(res[3, ]), as.vector(res[1, ]))
+    for (alpha in (c(1, 1/2, 1/5))) {
+      for (b1 in 1:get.network.attribute(net, "bipartite")) {
+        for (b2 in (get.network.attribute(net, "bipartite")+1) : get.network.attribute(net, "n")) {
+          res <- ergm.godfather(net ~ edges + cycle(4) + b1np4c(alpha) + b2np4c(alpha),
+                                changes = rep(list(cbind(b1,b2)), 2),
+                                stats.start = TRUE)
+          ## toggling edge twice means stats must be back to their start values
+          expect_equal(as.vector(res[3, ]), as.vector(res[1, ]))
+        }
       }
     }
   }
