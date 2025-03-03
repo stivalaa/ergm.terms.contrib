@@ -1,4 +1,4 @@
-s##
+##
 ## File:    bnp4c.test.R
 ## Author:  Alex Stivala
 ## Created: December 2024
