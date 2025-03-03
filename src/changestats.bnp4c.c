@@ -350,7 +350,7 @@ U_CHANGESTAT_FN(u_b2np4c) {
     delta = twopaths(nwp, vnode, b2, b1, b2);
     sto2->fourcycle_count[vnode-BIPARTITE-1] += is_delete ? -delta : delta;
     DEBUG_PRINT(("u_b2np4c [2] %d added %ld to get %lu\n", vnode-BIPARTITE-1, is_delete ? -delta : delta, sto2->fourcycle_count[vnode-BIPARTITE-1]));    
-  })
+  });
   DEBUG_PRINT(("XXX u_b2np4c exit\n"));  
 }
 
@@ -442,7 +442,7 @@ C_CHANGESTAT_FN(c_b2np4c) {
     delta = twopaths(nwp, vnode, b2, b1, b2);
     change += is_delete ? pow(vcount, alpha) - pow(vcount - delta, alpha) :
       pow(vcount + delta, alpha) - pow(vcount, alpha);
-  })
+  });
   CHANGE_STAT[0] += is_delete ? -change : change;
   DEBUG_PRINT(("XXX c_b2np4c exit\n"));
 }
