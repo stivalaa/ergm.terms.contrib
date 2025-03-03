@@ -241,21 +241,4 @@ plot_cycledist(davis, davis_model4, 'southern_women_model4_cycledist.eps')
 texreg(list(davis_model1, davis_model2, davis_model3, davis_model4), file = 'southern_women_models.tex', table=FALSE)
 
 
-
-## Does not converge (Error in snearPD(V) : Matrix ‘x’ has negative elements on the diagonal.):
-##system.time( davis_model4 <- ergm(davis ~ edges + gwb1degree(1, TRUE) + gwb2degree(1, TRUE) + b1np4c(1/5) + b2np4c(1/5), control = control.ergm(main.method = "Stochastic-Approximation")) )
-##system.time( davis_model4 <- ergm(davis ~ edges + gwb1degree(1, TRUE) + gwb2degree(1, TRUE) + b1np4c(1/10) + b2np4c(1/5), control = control.ergm(main.method = "Stochastic-Approximation")) )
-##system.time( davis_model4 <- ergm(davis ~ edges + gwb1degree(1, TRUE) + gwb2degree(1, TRUE) + b1np4c(1/50) + b2np4c(1/5), control = control.ergm(main.method = "Stochastic-Approximation")) )
-##system.time( davis_model4 <- ergm(davis ~ edges + gwb1degree(1, TRUE) + gwb2degree(1, TRUE) + b1np4c(1) + b2np4c(1/5), control = control.ergm(main.method = "Stochastic-Approximation")) )
-##system.time( davis_model4 <- ergm(davis ~ edges + gwb1degree(1, TRUE) + gwb2degree(1, TRUE) + b1np4c(1), control = control.ergm(main.method = "Stochastic-Approximation")) )
-
-
-## Does not converge (Error in snearPD(V) : Matrix ‘x’ has negative elements on the diagonal.):
-##system.time( davis_model5 <- ergm(davis ~ edges + gwb1degree(1, TRUE) + gwb2degree(1, TRUE) + cycle(4), control = control.ergm(main.method = "Stochastic-Approximation")) )
-
-## Bad MCMC diagnostics on b2np4c(1.0):
-##system.time( davis_model5 <- ergm(davis ~ edges + gwb1degree(1, TRUE) + gwb2degree(1, TRUE) + b2np4c(1.0), control = control.ergm(main.method = "Stochastic-Approximation")) )
-
-
-
 cat("End:", date())
