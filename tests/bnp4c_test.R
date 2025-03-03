@@ -362,3 +362,17 @@ test_that('bnp4c(1) is cycle(4)*2', {
 })
 
 
+test_that('bnp4c terms delete correct', {
+  ##
+  ## use ergm.godfather() to toggle edge twice, check we get correct
+  ## values and in particular, back to the initial values.
+  ###
+  res <- ergm.godfather(fourcycle.net ~ edges + cycle(4) + b1np4c(1) + b2np4c(1),
+                 changes = rep(list(cbind(1,3)), 2),
+                 stats.start = TRUE)
+  print(res)#XXX
+  expect_equal(as.vector(res[, "edges"]),          c(4, 3, 4))
+  expect_equal(as.vector(res[, "cycle4"]),         c(1, 0, 1))
+  expect_equal(as.vector(res[, "b1np4c.fixed.1"]), c(2, 0, 2))
+  expect_equal(as.vector(res[, "b2np4c.fixed.1"]), c(2, 0, 2))
+})
