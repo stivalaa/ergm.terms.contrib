@@ -40,7 +40,6 @@
 #include "ergm_changestat.h"
 #include "ergm_storage.h"
 
-#define DEBUG //XXX
 #ifdef DEBUG
 #define DEBUG_PRINT(x) printf("DEBUG BNP4C: "); printf x
 #else
