@@ -148,6 +148,8 @@ static unsigned int twopaths(Network *nwp, Vertex i, Vertex j,
         count++;
     }
   }
+  if (GETUDMUI(i, j, spcache) != count)
+    error("cache count wrong %d %d got %u should be %u\n", i, j, GETUDMUI(i, j, spcache), count);
   return count;
 }
 
