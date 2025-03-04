@@ -39,6 +39,7 @@
 
 #include "ergm_changestat.h"
 #include "ergm_storage.h"
+#include "ergm_dyad_hashmap.h"
 
 #ifdef DEBUG
 #define DEBUG_PRINT(x) printf("DEBUG BNP4C: "); printf x
@@ -99,7 +100,8 @@ static unsigned long n_choose_2(int n)
  * (valid Vertices are numbered 1..N_NODES)
  */
 static unsigned int twopaths(Network *nwp, Vertex i, Vertex j,
-                             Vertex ignore1, Vertex ignore2)  {
+                             Vertex ignore1, Vertex ignore2,
+                             StoreStrictDyadMapUInt *spcache)  {
   /* Note Network *nwp parameter has to be called nwp for use of macros */
 
   Vertex vnode, wnode;
@@ -158,7 +160,8 @@ static unsigned int twopaths(Network *nwp, Vertex i, Vertex j,
  *
  */
 static unsigned long num_fourcycles_node(Network *nwp, Vertex unode,
-                                         bnp4c_storage_t *sto)  {
+                                         bnp4c_storage_t *sto,
+                                         StoreStrictDyadMapUInt *spcache)  {
   /* Note Network *nwp parameter has to be called nwp for use of macros */
 
   Vertex vnode, wnode;
@@ -176,13 +179,13 @@ static unsigned long num_fourcycles_node(Network *nwp, Vertex unode,
     STEP_THROUGH_OUTEDGES(vnode, edge2, wnode) {
       if (wnode != unode && !visited[wnode-1]) {
         visited[wnode-1] = 1;
-        fourcycle_count += n_choose_2(twopaths(nwp, unode, wnode, 0, 0));
+        fourcycle_count += n_choose_2(twopaths(nwp, unode, wnode, 0, 0, spcache));
       }
     }
     STEP_THROUGH_INEDGES(vnode, edge2, wnode) {
       if (wnode != unode && !visited[wnode-1]) {
         visited[wnode-1] = 1;
-        fourcycle_count += n_choose_2(twopaths(nwp, unode, wnode, 0, 0));
+        fourcycle_count += n_choose_2(twopaths(nwp, unode, wnode, 0, 0, spcache));
       }
     }
   }
@@ -190,13 +193,13 @@ static unsigned long num_fourcycles_node(Network *nwp, Vertex unode,
     STEP_THROUGH_OUTEDGES(vnode, edge2, wnode) {
       if (wnode != unode && !visited[wnode-1]) {
         visited[wnode-1] = 1;
-        fourcycle_count += n_choose_2(twopaths(nwp, unode, wnode, 0, 0));
+        fourcycle_count += n_choose_2(twopaths(nwp, unode, wnode, 0, 0, spcache));
       }
     }
     STEP_THROUGH_INEDGES(vnode, edge2, wnode) {
       if (wnode != unode && !visited[wnode-1]) {
         visited[wnode-1] = 1;
-        fourcycle_count += n_choose_2(twopaths(nwp, unode, wnode, 0, 0));
+        fourcycle_count += n_choose_2(twopaths(nwp, unode, wnode, 0, 0, spcache));
       }
     }
   }
@@ -214,7 +217,8 @@ static unsigned long num_fourcycles_node(Network *nwp, Vertex unode,
  * (valid Vertices are numbered 1..N_NODES)
  */
 static unsigned long change_fourcycles(Network *nwp, Vertex i, Vertex j,
-                                       Vertex ignore1, Vertex ignore2) {
+                                       Vertex ignore1, Vertex ignore2,
+                                       StoreStrictDyadMapUInt *spcache) {
   /* Note Network *nwp parameter has to be called nwp for use of macros */
   Vertex vnode;
   Edge edge;
@@ -226,12 +230,12 @@ static unsigned long change_fourcycles(Network *nwp, Vertex i, Vertex j,
   STEP_THROUGH_OUTEDGES(i, edge, vnode) {
     if ((i == ignore1 && vnode == ignore2) || (i == ignore2 && vnode == ignore1))
       continue;
-    delta += twopaths(nwp, vnode, j, ignore1, ignore2);
+    delta += twopaths(nwp, vnode, j, ignore1, ignore2, spcache);
   }
   STEP_THROUGH_INEDGES(i, edge, vnode) {
     if ((i == ignore1 && vnode == ignore2) || (i == ignore2 && vnode == ignore1))
       continue;
-    delta += twopaths(nwp, vnode, j, ignore1, ignore2);
+    delta += twopaths(nwp, vnode, j, ignore1, ignore2, spcache);
   }
   return delta;
 }
@@ -277,11 +281,12 @@ static unsigned long change_fourcycles(Network *nwp, Vertex i, Vertex j,
 I_CHANGESTAT_FN(i_b1np4c) {
   ALLOC_STORAGE(1, bnp4c_storage_t, sto1);
   DEBUG_PRINT(("i_b1np4c N_NODES = %d BIPARTITE = %d\n", N_NODES, BIPARTITE));
+  GET_AUX_STORAGE(StoreStrictDyadMapUInt, spcache); /* shared partner cache */
   sto1->visited = R_Calloc(N_NODES, int);
   if (BIPARTITE == 0) error("Network must be bipartite\n");
   sto1->fourcycle_count = R_Calloc(BIPARTITE, unsigned long);
   for (int i = 1; i <= BIPARTITE; i++) {
-    sto1->fourcycle_count[i-1] = num_fourcycles_node(nwp, i, sto1);
+    sto1->fourcycle_count[i-1] = num_fourcycles_node(nwp, i, sto1, spcache);
     DEBUG_PRINT(("i_b1np4c %d (index %d) set to %lu\n", i, i-1, sto1->fourcycle_count[i-1]));
   }
 }
@@ -289,11 +294,12 @@ I_CHANGESTAT_FN(i_b1np4c) {
 I_CHANGESTAT_FN(i_b2np4c) {
   ALLOC_STORAGE(1, bnp4c_storage_t, sto2);
   DEBUG_PRINT(("i_b2np4c N_NODES = %d BIPARTITE = %d\n", N_NODES, BIPARTITE));
+  GET_AUX_STORAGE(StoreStrictDyadMapUInt, spcache); /* shared partner cache */
   sto2->visited = R_Calloc(N_NODES, int);
   if (BIPARTITE == 0) error("Network must be bipartite\n");  
   sto2->fourcycle_count = R_Calloc(N_NODES-BIPARTITE, unsigned long);
   for (int i = BIPARTITE+1; i <= N_NODES; i++) {
-    sto2->fourcycle_count[i-BIPARTITE-1] = num_fourcycles_node(nwp, i, sto2);
+    sto2->fourcycle_count[i-BIPARTITE-1] = num_fourcycles_node(nwp, i, sto2, spcache);
     DEBUG_PRINT(("i_b2np4c %d (index %d) set to %lu\n", i, i-BIPARTITE-1, sto2->fourcycle_count[i-BIPARTITE-1]));
   }
 }
@@ -318,14 +324,15 @@ U_CHANGESTAT_FN(u_b1np4c) {
   DEBUG_PRINT(("XXX u_b1np4c entered b1 = %d is_delete = %d\n", b1, is_delete));
   GET_STORAGE(bnp4c_storage_t, sto1); /* Obtain a pointer to private storage
                                          and cast it to the correct type. */
+  GET_AUX_STORAGE(StoreStrictDyadMapUInt, spcache); /* shared partner cache */
   /* change statistic for four-cycles */
-  delta = change_fourcycles(nwp, b1, b2, b1, b2);
+  delta = change_fourcycles(nwp, b1, b2, b1, b2, spcache);
   sto1->fourcycle_count[b1-1] += is_delete ? -delta : delta;
   DEBUG_PRINT(("u_b1np4c for %d added %ld to get %lu\n", b1, delta,sto1->fourcycle_count[b1-1]));
   /* add also have to update neighbours of b2 */
   EXEC_THROUGH_EDGES(b2, edge, vnode,  { /* step through edges of b2 */
     if (vnode == b1) continue; /* except for b1 -- b2 edge (if is_delete) */
-    delta = twopaths(nwp, vnode, b1, b1, b2);
+    delta = twopaths(nwp, vnode, b1, b1, b2, spcache);
     sto1->fourcycle_count[vnode-1] += is_delete ? -delta : delta;
     DEBUG_PRINT(("u_b1np4c for %d added %ld to get %lu\n",vnode-1, delta,sto1->fourcycle_count[vnode-1]));
   });
@@ -340,14 +347,16 @@ U_CHANGESTAT_FN(u_b2np4c) {
   DEBUG_PRINT(("XXX u_b2np4c entered b2 = %d is_delete = %d\n", b2, is_delete));
   GET_STORAGE(bnp4c_storage_t, sto2); /* Obtain a pointer to private storage
                                          and cast it to the correct type. */
+  GET_AUX_STORAGE(StoreStrictDyadMapUInt, spcache); /* shared partner cache */
+  
   /* change statistic for four-cycles */
-  delta = change_fourcycles(nwp, b1, b2, b1, b2);
+  delta = change_fourcycles(nwp, b1, b2, b1, b2, spcache);
   sto2->fourcycle_count[b2-BIPARTITE-1] += is_delete ? -delta : delta;
   DEBUG_PRINT(("u_b2np4c [1] %d added %ld to get %lu\n", b2-BIPARTITE-1, is_delete ? -delta : delta, sto2->fourcycle_count[b2-BIPARTITE-1]));
   /* also changes four-cycle counts for neighbours of b1 */
   EXEC_THROUGH_EDGES(b1, edge, vnode, { /* step through edges of b1 */
     if (vnode == b2) continue; /* except for b1 -- b2 edge (if is_delete) */
-    delta = twopaths(nwp, vnode, b2, b1, b2);
+    delta = twopaths(nwp, vnode, b2, b1, b2, spcache);
     sto2->fourcycle_count[vnode-BIPARTITE-1] += is_delete ? -delta : delta;
     DEBUG_PRINT(("u_b2np4c [2] %d added %ld to get %lu\n", vnode-BIPARTITE-1, is_delete ? -delta : delta, sto2->fourcycle_count[vnode-BIPARTITE-1]));    
   });
@@ -368,6 +377,7 @@ C_CHANGESTAT_FN(c_b1np4c) {
 
   GET_STORAGE(bnp4c_storage_t, sto1); /* Obtain a pointer to private storage
                                        and cast it to the correct type. */
+  GET_AUX_STORAGE(StoreStrictDyadMapUInt, spcache); /* shared partner cache */
   alpha = INPUT_PARAM[0];
 
   b1 = tail;
@@ -383,7 +393,7 @@ C_CHANGESTAT_FN(c_b1np4c) {
   if (num_fourcycles_node(nwp, b1, sto1) != count) error("b1np4c incorrect fourcycle count [1] for %d correct %lu got %lu\n", b1, num_fourcycles_node(nwp, b1, sto1), count);
 #endif /* DEBUG */
   /* change statistic for four-cycles */
-  delta = change_fourcycles(nwp, b1, b2, b1, b2);
+  delta = change_fourcycles(nwp, b1, b2, b1, b2, spcache);
   change = is_delete ? pow(count, alpha) - pow(count - delta, alpha) :
     pow(count + delta, alpha) - pow(count, alpha);
 
@@ -395,7 +405,7 @@ C_CHANGESTAT_FN(c_b1np4c) {
 /*     /\* using #ifdef inside macro (EXEC_THROUGH_EDGES) gives compiler warning *\/ */
 /*     if (num_fourcycles_node(nwp, vnode, sto1) != vcount) error("b1np4c incorrect fourcycle count [2] for %d correct %lu got %lu\n", vnode, num_fourcycles_node(nwp, vnode, sto1), vcount); */
 /* #endif /\* DEBUG *\/ */
-    delta = twopaths(nwp, vnode, b1, b1, b2);
+    delta = twopaths(nwp, vnode, b1, b1, b2, spcache);
     change += is_delete ? pow(vcount, alpha) - pow(vcount - delta, alpha) :
       pow(vcount + delta, alpha) - pow(vcount, alpha);
   });
@@ -420,6 +430,7 @@ C_CHANGESTAT_FN(c_b2np4c) {
 
   GET_STORAGE(bnp4c_storage_t, sto2); /* Obtain a pointer to private storage
                                        and cast it to the correct type. */
+  GET_AUX_STORAGE(StoreStrictDyadMapUInt, spcache); /* shared partner cache */
   alpha = INPUT_PARAM[0];
 
   b1 = tail;
@@ -435,7 +446,7 @@ C_CHANGESTAT_FN(c_b2np4c) {
   if (num_fourcycles_node(nwp, b2, sto2) != count) error("b2np4c incorrect fourcycle count [1] for %d correct %lu got %lu\n", b2, num_fourcycles_node(nwp, b2, sto2), count);
 #endif /* DEBUG */
   /* change statistic for four-cycles */
-  delta = change_fourcycles(nwp, b1, b2, b1, b2);
+  delta = change_fourcycles(nwp, b1, b2, b1, b2, spcache);
   change = is_delete ? pow(count, alpha) - pow(count - delta, alpha) :
     pow(count + delta, alpha) - pow(count, alpha);
 
@@ -447,7 +458,7 @@ C_CHANGESTAT_FN(c_b2np4c) {
 /*     /\* using #ifdef inside macro (EXEC_THROUGH_EDGES) gives compiler warning *\/ */
 /*     if (num_fourcycles_node(nwp, vnode, sto2) != vcount) error("b2np4c incorrect fourcycle count [2] for %d correct %lu got %lu\n", vnode, num_fourcycles_node(nwp, vnode, sto2), vcount); */
 /* #endif /\* DEBUG *\/ */
-    delta = twopaths(nwp, vnode, b2, b1, b2);
+    delta = twopaths(nwp, vnode, b2, b1, b2, spcache);
     change += is_delete ? pow(vcount, alpha) - pow(vcount - delta, alpha) :
       pow(vcount + delta, alpha) - pow(vcount, alpha);
   });

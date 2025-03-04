@@ -148,7 +148,8 @@ InitErgmTerm.b1np4c <- function(nw, arglist, ...) {
        coef.names = paste("b1np4c.fixed.", alpha, sep=""),
        inputs = c(alpha),
        dependence = TRUE,
-       pkgname = "ergm.terms.contrib")
+       pkgname = "ergm.terms.contrib",
+       auxiliaries = ~.spcache.net("UTP"))
 }
 
 
@@ -177,6 +178,7 @@ InitErgmTerm.b2np4c <- function(nw, arglist, ...) {
        coef.names = paste("b2np4c.fixed.", alpha, sep=""),
        inputs = c(alpha),
        dependence = TRUE,
-       pkgname = "ergm.terms.contrib")
+       pkgname = "ergm.terms.contrib",
+       auxiliaries = ~.spcache.net("UTP"))
 }
 
