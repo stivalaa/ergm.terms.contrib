@@ -108,8 +108,12 @@ static unsigned int twopaths(Network *nwp, Vertex i, Vertex j,
   Edge edge1, edge2;
   unsigned int count = 0;
 
-  /* It would be better if we could precompute or cache two-path counts like
-     EstimNetDirected or statnet gwesp etc. cache */
+  /* Note we cannot use the shared partner (two-path) cache if we
+     are to ignore an edge, since the cache does not account for this
+     (this happens in the case of delete moves only).
+  */
+  if (!(ignore1 && ignore2))   /* if not ignoring an edge */
+    return GETUDMUI(i, j, spcache); /* just use the cache */
 
   /* In an undirected network, each edge is only stored as (tail, head) where
      tail < head, so to step through all edges of a node it is necessary
@@ -148,8 +152,6 @@ static unsigned int twopaths(Network *nwp, Vertex i, Vertex j,
         count++;
     }
   }
-  if (GETUDMUI(i, j, spcache) != count)
-    error("cache count wrong %d %d got %u should be %u\n", i, j, GETUDMUI(i, j, spcache), count);
   return count;
 }
 
