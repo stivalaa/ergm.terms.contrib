@@ -41,7 +41,6 @@
 #include "ergm_storage.h"
 #include "ergm_dyad_hashmap.h"
 
-#define DEBUG//XXX
 #ifdef DEBUG
 #define DEBUG_PRINT(x) printf("DEBUG BNP4C: "); printf x
 #else
