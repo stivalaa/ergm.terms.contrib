@@ -135,7 +135,9 @@ static unsigned int twopaths(Network *nwp, Vertex i, Vertex j,
   }
 
 #ifdef DEBUG
-  /* This code is dead when not ing DEBUG compilation mode */
+  /* This code is dead when not in DEBUG compilation mode,
+     It is here to verify the above optimization against
+     explicit recomputation of the two-paths counts in DEBUG mode. */
   
   /* In an undirected network, each edge is only stored as (tail, head) where
      tail < head, so to step through all edges of a node it is necessary
@@ -177,7 +179,7 @@ static unsigned int twopaths(Network *nwp, Vertex i, Vertex j,
 
   if (count != count2p)
     error("twopaths count = %u but count2p = %u not equal\n", count, count2p);
-#endif
+#endif /* DEBUG */
   return count2p;
 }
 
