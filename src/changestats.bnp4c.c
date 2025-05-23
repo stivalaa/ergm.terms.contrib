@@ -105,10 +105,11 @@ static unsigned int twopaths(Network *nwp, Vertex i, Vertex j,
                              int is_delete,
                              StoreStrictDyadMapUInt *spcache)  {
   /* Note Network *nwp parameter has to be called nwp for use of macros */
-
+#ifdef DEBUG
   Vertex vnode, wnode;
   Edge edge1, edge2;
   unsigned int count = 0;
+#endif
   unsigned int count2p = 0;
 
   /* Note we cannot simply use the shared partner (two-path) cache
@@ -118,29 +119,23 @@ static unsigned int twopaths(Network *nwp, Vertex i, Vertex j,
      the ignore1--ignore2 edge is part of a two-path between i and j.
   */
   count2p = GETUDMUI(i, j, spcache); /* get cached two-path count */
-  if (!is_delete || !(ignore1 && ignore2))   /* if not ignoring an edge */
-    return count2p;
-
-  DEBUG_PRINT(("twopaths i = %d j = %d ignore1 = %d ignore2 = %d is_delete = %d count2p = %u\n", i, j, ignore1, ignore2, is_delete, count2p));
-  if (i == ignore1 || i == ignore2) {
-    if (i == ignore1 && IS_UNDIRECTED_EDGE(ignore2, j))
-      return count2p - 1;
-    else if (i == ignore2 && IS_UNDIRECTED_EDGE(ignore1, j))
-      return count2p - 1;
-    else
-      return count2p;
-  } else if (j == ignore1 || j == ignore2) {
-    if (j == ignore1 && IS_UNDIRECTED_EDGE(ignore2, i))
-      return count2p - 1;
-    else if (j == ignore2 && IS_UNDIRECTED_EDGE(ignore1, i))
-      return count2p - 1;
-    else
-      return count2p;
+  if (is_delete && (ignore1 && ignore2))  {
+    DEBUG_PRINT(("twopaths i = %d j = %d ignore1 = %d ignore2 = %d is_delete = %d count2p = %u\n", i, j, ignore1, ignore2, is_delete, count2p));
+    if (i == ignore1 || i == ignore2) {
+      if (i == ignore1 && IS_UNDIRECTED_EDGE(ignore2, j))
+        count2p--;
+      else if (i == ignore2 && IS_UNDIRECTED_EDGE(ignore1, j))
+        count2p--;
+    } else if (j == ignore1 || j == ignore2) {
+      if (j == ignore1 && IS_UNDIRECTED_EDGE(ignore2, i))
+        count2p--;
+      else if (j == ignore2 && IS_UNDIRECTED_EDGE(ignore1, i))
+        count2p--;
+    }
   }
-  else /* i and j are disjoint with ignore1 and ignore2 */
-    return count2p; 
-  
-  /* TODO code below is now dead, could be used for debug compare to above */
+
+#ifdef DEBUG
+  /* This code is dead when not ing DEBUG compilation mode */
   
   /* In an undirected network, each edge is only stored as (tail, head) where
      tail < head, so to step through all edges of a node it is necessary
@@ -179,7 +174,11 @@ static unsigned int twopaths(Network *nwp, Vertex i, Vertex j,
         count++;
     }
   }
-  return count;
+
+  if (count != count2p)
+    error("twopaths count = %u but count2p = %u not equal\n", count, count2p);
+#endif
+  return count2p;
 }
 
 
