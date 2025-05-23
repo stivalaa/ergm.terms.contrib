@@ -102,7 +102,7 @@ static unsigned long n_choose_2(int n)
  */
 static unsigned int twopaths(Network *nwp, Vertex i, Vertex j,
                              Vertex ignore1, Vertex ignore2,
-			     int is_delete,
+                             int is_delete,
                              StoreStrictDyadMapUInt *spcache)  {
   /* Note Network *nwp parameter has to be called nwp for use of macros */
 
@@ -249,7 +249,7 @@ static unsigned long num_fourcycles_node(Network *nwp, Vertex unode,
  */
 static unsigned long change_fourcycles(Network *nwp, Vertex i, Vertex j,
                                        Vertex ignore1, Vertex ignore2,
-				       int is_delete,
+                                       int is_delete,
                                        StoreStrictDyadMapUInt *spcache) {
   /* Note Network *nwp parameter has to be called nwp for use of macros */
   Vertex vnode;
